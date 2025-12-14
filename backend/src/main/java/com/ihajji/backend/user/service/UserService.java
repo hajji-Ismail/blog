@@ -1,9 +1,7 @@
 package com.ihajji.backend.user.service;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +12,6 @@ import com.ihajji.backend.user.dto.UserCredentiales;
 import com.ihajji.backend.user.entity.UserEntity;
 import com.ihajji.backend.user.repository.UserRepository;
 import com.ihajji.backend.user.utils.JwtUtil;
-
 
 @Service
 public class UserService {
@@ -29,7 +26,7 @@ public class UserService {
         this.jwtUtil = jwtUtil;
     }
 
-    public UserEntity register(CreateUserDto dto) throws ErrorResponse {
+    public AuthResponse register(CreateUserDto dto) throws ErrorResponse {
 
         Map<String, String> errors = new HashMap<>();
 
@@ -51,24 +48,29 @@ public class UserService {
         user.setUsername(dto.getUsername());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
-        return userRepository.save(user);
-    }
-    public AuthResponse login(UserCredentiales dto) throws ErrorResponse{
-       
-    UserEntity userInfo = userRepository.findByUsername(dto.getEmail_or_username())
-    .or(() -> userRepository.findByEmail(dto.getEmail_or_username()))
-    .orElseThrow(() -> new ErrorResponse("Login failed: User not found"));
-    if(!passwordEncoder.matches(dto.getPassword(), userInfo.getPassword())){
-        throw new ErrorResponse("Login failed: Invalid credentials ");
-    }
-      Map<String, Object> claims = new HashMap<>();
-    claims.put("role", "user");
-    String accessToken = this.jwtUtil.generateToken(claims, userInfo.getUsername()); // Renamed token to accessToken
-    
-    // Instead of creating the cookie here, just return the token and user info
-    return new AuthResponse(userInfo, accessToken);
+        UserEntity user_Info = userRepository.save(user);
 
-        
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", "user");
+        String accessToken = this.jwtUtil.generateToken(claims, user_Info.getUsername()); // Renamed token to accessToken
+
+        // Instead of creating the cookie here, just return the token and user info
+        return new AuthResponse(user_Info, accessToken);
+
+    }
+
+    public AuthResponse login(UserCredentiales dto) throws ErrorResponse {
+
+        UserEntity userInfo = userRepository.findByUsername(dto.getEmail_or_username())
+                .or(() -> userRepository.findByEmail(dto.getEmail_or_username()))
+                .orElseThrow(() -> new ErrorResponse("Login failed: User not found"));
+        if (!passwordEncoder.matches(dto.getPassword(), userInfo.getPassword())) {
+            throw new ErrorResponse("Login failed: Invalid credentials ");
+        }
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", "user");
+        String accessToken = this.jwtUtil.generateToken(claims, userInfo.getUsername());
+        return new AuthResponse(userInfo, accessToken);
 
     }
 }

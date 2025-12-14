@@ -9,19 +9,24 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class UserConfig {
-      @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable()) // Lambda syntax
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/Auth/**").permitAll()
-                        .anyRequest().authenticated())
-                .httpBasic(httpBasic -> {}); // optional for testing
 
-        return http.build();
-    }
-    
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .csrf(csrf -> csrf.disable())
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/api/v1/Auth/**").permitAll()
+
+                                                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                                                .requestMatchers("/api/v1/user/**").hasAnyRole("USER", "ADMIN")
+
+                                                .anyRequest().authenticated())
+
+                                .httpBasic(httpBasic -> {
+                                });
+
+                return http.build();
+        }
+
 }
-
-
-

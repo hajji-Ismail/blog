@@ -41,25 +41,20 @@ public class UserController {
 @PostMapping("/register")
 public ResponseEntity<?> register(@Valid @RequestBody CreateUserDto dto) {
     try {
-        UserEntity saved = userService.register(dto);
-
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", "user");
-
-        String token = jwt.generateToken(claims, dto.getUsername());
-
-        ResponseCookie jwtCookie = ResponseCookie.from("JWT", token)
-                .httpOnly(true)        // NOT accessible from JS
-                .secure(false)         // true in production (HTTPS)
-                .path("/")             // available for whole app
-                .maxAge(24 * 60 * 60)  // 1 day
-                .sameSite("Lax")       // recommended for auth cookies
-                .build();
-
+         AuthResponse saved = userService.register(dto);
+        ResponseCookie jwtCookie = ResponseCookie.from("JWT",saved.getAccessToken())
+            .httpOnly(true)
+            .secure(true) 
+            .path("/")
+            .maxAge(24 * 60 * 60)
+            .sameSite("Lax")
+            .build();
+        
+        
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(saved);
+            .body(new ErrorResponse("regester went smoothly"));
 
     } catch (ErrorResponse e) {
         return ResponseEntity.badRequest().body(e);
@@ -82,7 +77,7 @@ public ResponseEntity<?>login(@RequestBody UserCredentiales dto) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(AuthResponse);
+                .body(new ErrorResponse("log in went smoothly"));
 
       
         
