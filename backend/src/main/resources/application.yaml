@@ -1,24 +1,31 @@
 spring:
+  # --- Datasource Configuration ---
   datasource:
-
+    # ... (datasource properties)
     url: jdbc:postgresql://localhost:5431/blog
-    
-
     username: postgres
-    
- 
-    password: Ha1155s0a53@DATA
-
+    password: Ha1155s0a53@DATA 
     driver-class-name: org.postgresql.Driver
 
-  
+  # --- JPA and Hibernate Configuration ---
   jpa:
-    show-sql: true 
+    show-sql: true
     hibernate:
-      
       ddl-auto: update
-      
     properties:
       hibernate:
-       
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # --- Cloudinary Configuration ---
+  # FIX: Ensure 'cloudinary' is aligned with 'datasource' and 'jpa'
+  # The 'cloudinary' block MUST be indented one level under 'spring:'
+  cloudinary:
+    # The sub-properties must be indented one level under 'cloudinary:'
+    cloud-name: dusotzx98
+    api-key: 185134715417857
+    api-secret: bZ6bKFHehcWGLXGUh88O3tU3EJg
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB

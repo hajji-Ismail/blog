@@ -1,0 +1,59 @@
+<div class="register-wrapper">
+  <div class="left-panel">
+    <div class="welcome-msg">
+      <h1>Join Us</h1>
+      <p>Create an account to get started.</p>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="form-container">
+      <h2>Register</h2>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onregister()">
+
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            formControlName="username"
+            placeholder="Choose a username">
+        </div>
+
+        <div class="input-group">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            placeholder="name@example.com">
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            placeholder="••••••••">
+        </div>
+
+        <div class="input-group">
+          <label for="profile">Profile Picture</label>
+          <input
+            type="file"
+            id="profile"
+            accept="image/*"
+            (change)="onFileSelected($event)">
+          <small>Select an image file (PNG, JPG)</small>
+        </div>
+
+        <button type="submit" [disabled]="registerForm.invalid || !selectedFile">
+          Create Account
+        </button>
+
+      </form>
+    </div>
+  </div>
+</div>
