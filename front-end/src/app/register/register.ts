@@ -28,8 +28,8 @@ export class register implements OnInit {
   }
 
   onregister() {
-    if (this.registerForm.invalid || !this.selectedFile) {
-      alert("Please fill all fields and select a photo");
+    if (this.registerForm.invalid) {
+      alert("Please fill all fields ");
       return;
     }
 
@@ -38,18 +38,22 @@ export class register implements OnInit {
     // 1. Create the FormData envelope
     const formData = new FormData();
 
+
     // 2. Add your text fields
     formData.append('username', this.registerForm.get('username')?.value);
     formData.append('email', this.registerForm.get('email')?.value);
     formData.append('password', this.registerForm.get('password')?.value);
+if (this.selectedFile){
 
-    // 3. Add the file (the key must match what your API expects, e.g., 'profile')
-    formData.append('profile', this.selectedFile);
+  formData.append('profileImage', this.selectedFile);
+}
+
 
     // 4. Send it! (Angular automatically sets the correct Headers for FormData)
     this.http.post(url, formData).subscribe({
       next: (res) => alert('Registration Successful!'),
-      error: (err) => alert('API Error: ' + err.message)
+      error: (err) => console.log(err),
+
     });
   }
 }

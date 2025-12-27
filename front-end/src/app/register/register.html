@@ -1,10 +1,4 @@
-<div class="register-wrapper">
-  <div class="left-panel">
-    <div class="welcome-msg">
-      <h1>Join Us</h1>
-      <p>Create an account to get started.</p>
-    </div>
-  </div>
+
 
   <div class="right-panel">
     <div class="form-container">
@@ -49,11 +43,11 @@
           <small>Select an image file (PNG, JPG)</small>
         </div>
 
-        <button type="submit" [disabled]="registerForm.invalid || !selectedFile">
+        <button type="submit" [disabled]="registerForm.invalid ">
           Create Account
         </button>
 
       </form>
     </div>
   </div>
-</div>
+

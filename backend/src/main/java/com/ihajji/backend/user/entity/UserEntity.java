@@ -1,6 +1,10 @@
 package com.ihajji.backend.user.entity;
 
 
+import java.util.List;
+
+import com.ihajji.backend.posts.entity.PostEntity;
+
 import jakarta.persistence.*;
 
 
@@ -19,6 +23,8 @@ public class UserEntity {
 
     @Column(nullable = false)
     private String password;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<PostEntity> posts;
 
     private String role = "user";
 
@@ -49,5 +55,11 @@ public class UserEntity {
 
     public String getProfileImageUrl() { return profileImageUrl; }
     public void setProfileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; }
+    public List<PostEntity> getPosts() {
+        return posts;
+    }
+    public void setPosts(List<PostEntity> posts) {
+        this.posts = posts;
+    }
 
 }
