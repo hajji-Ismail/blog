@@ -4,7 +4,7 @@ spring:
     # ... (datasource properties)
     url: jdbc:postgresql://localhost:5431/blog
     username: postgres
-    password: Ha1155s0a53@DATA 
+    password: Ha1155s0a53@DATA
     driver-class-name: org.postgresql.Driver
 
   # --- JPA and Hibernate Configuration ---

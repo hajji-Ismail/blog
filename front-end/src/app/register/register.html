@@ -13,6 +13,7 @@
             id="username"
             formControlName="username"
             placeholder="Choose a username">
+            <p> {{ username() }}</p>
         </div>
 
         <div class="input-group">
@@ -22,6 +23,7 @@
             id="email"
             formControlName="email"
             placeholder="name@example.com">
+            <p> {{ email() }}</p>
         </div>
 
         <div class="input-group">
@@ -31,6 +33,7 @@
             id="password"
             formControlName="password"
             placeholder="••••••••">
+            <p> {{ password() }}</p>
         </div>
 
         <div class="input-group">
@@ -46,6 +49,7 @@
         <button type="submit" [disabled]="registerForm.invalid ">
           Create Account
         </button>
+      <p>Current Status: {{ message() }}</p>
 
       </form>
     </div>

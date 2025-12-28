@@ -30,7 +30,7 @@ public class FileUploadService {
             
         } catch (IOException e) {
             // Log the exception or throw a custom runtime exception
-            throw new IOException("Failed to upload file to Cloudinary: " + e.getMessage());
+            throw new IOException("Failed to upload file : " + e.getMessage());
         }
     }
 }
