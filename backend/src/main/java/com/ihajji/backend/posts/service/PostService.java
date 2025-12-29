@@ -9,9 +9,11 @@ import java.util.Optional;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ihajji.backend.posts.dto.PostErrorsDto;
+import com.ihajji.backend.posts.dto.PostFeedDto;
 import com.ihajji.backend.posts.dto.PostRequestDTO;
 import com.ihajji.backend.posts.entity.MediaEntity;
 import com.ihajji.backend.posts.entity.PostEntity;
@@ -19,6 +21,8 @@ import com.ihajji.backend.posts.repository.PostRepository;
 import com.ihajji.backend.user.entity.UserEntity;
 import com.ihajji.backend.user.repository.UserRepository;
 import com.ihajji.backend.user.utils.FileUploadService;
+
+
 @Service
 public class PostService {
     private final FileUploadService fileUploadService;
@@ -88,5 +92,11 @@ if (dto.mediaFiles() != null) {
         return errors;
         
     }
+    @Transactional(readOnly = true)
+    public List<PostFeedDto> getAllPosts() {
 
+        return this.PostRepo.findAllPostFeed();
+    }
+
+    
 }

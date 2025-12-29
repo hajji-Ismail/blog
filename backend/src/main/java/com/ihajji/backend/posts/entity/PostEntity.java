@@ -17,6 +17,8 @@ public class PostEntity {
     private Long id;
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MediaEntity> medias;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<ReactionEntity> reactions;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false) // This creates the foreign key column
     private UserEntity user;
@@ -37,6 +39,9 @@ public class PostEntity {
     public Long getId() {
         return id;
     }
+    public List<ReactionEntity> getReactions() {
+        return reactions;
+    }
 
     public String getTitle() {
         return title;
@@ -52,6 +57,9 @@ public class PostEntity {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+    public void setReactions(List<ReactionEntity> reactions) {
+        this.reactions = reactions;
     }
 
     public UserEntity getUser() {
