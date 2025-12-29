@@ -3,7 +3,6 @@ package com.ihajji.backend.user.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ihajji.backend.user.config.UserPrincipal;
 import com.ihajji.backend.user.dto.AuthResponse;
 import com.ihajji.backend.user.dto.CreateUserDto;
 import com.ihajji.backend.user.dto.UserCredentiales;
@@ -15,10 +14,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -95,15 +91,6 @@ public ResponseEntity<AuthResponse> register(@Valid @ModelAttribute CreateUserDt
                     .body(AuthResponse);
 
         
-    }
-  @GetMapping("/profile")
-    public ResponseEntity<?> getProfile(@AuthenticationPrincipal UserPrincipal principal) {
-        // principal will no longer be null because the Filter replaces the default principal
-        if (principal == null) {
-            return ResponseEntity.status(401).body("Not authenticated");
-        }
-        
-        return ResponseEntity.ok("User ID: " + principal.getId() + " Email: " + principal.getUsername());
     }
 
    

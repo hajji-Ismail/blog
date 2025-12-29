@@ -28,7 +28,7 @@ public class PostEntity {
     private List<CommentEntity> comments;
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     public String getContent() {
         return content;

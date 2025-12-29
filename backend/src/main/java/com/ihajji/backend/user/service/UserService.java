@@ -102,6 +102,7 @@ public class UserService {
         // 7. Generate JWT Token
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", "USER");
+        claims.put("is_banned",false);
 
         String accessToken = jwtUtil.generateToken(
                 claims,
@@ -135,6 +136,7 @@ public class UserService {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", "USER");
+        claims.put("is_banned",user.getIs_baned());
 
         String accessToken = jwtUtil.generateToken(
                 claims,
