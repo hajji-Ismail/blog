@@ -22,9 +22,11 @@ public class CommentEntity {
     private UserEntity user;
     @Column(name = "Content")
     private String Content;
+   
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
     public String getContent() {
         return Content;
     }
