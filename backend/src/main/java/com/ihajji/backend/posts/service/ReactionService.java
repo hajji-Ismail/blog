@@ -52,8 +52,7 @@ public class ReactionService {
 
         this.repo.save(react);
 
-        return null;
-
+return new ErrorDto();
     }
 
 }

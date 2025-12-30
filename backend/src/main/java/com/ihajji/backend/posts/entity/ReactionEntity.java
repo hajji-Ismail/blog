@@ -22,7 +22,7 @@ public class ReactionEntity {
     private PostEntity post;
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

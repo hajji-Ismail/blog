@@ -3,6 +3,7 @@ package com.ihajji.backend.posts.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ihajji.backend.posts.dto.ErrorDto;
 import com.ihajji.backend.posts.dto.PostErrorsDto;
 import com.ihajji.backend.posts.dto.PostFeedDto;
 import com.ihajji.backend.posts.dto.PostRequestDTO;
@@ -47,14 +48,14 @@ public class PostController {
       return ResponseEntity.ok(Post);
        
     }
-    @PostMapping("path")
-    public String postMethodName(@RequestBody String entity) {
-        //TODO: process POST request
-        
-        return entity;
+    @PostMapping("/delete")
+    public ResponseEntity< ErrorDto> delete(@RequestBody Long  postId ,  @AuthenticationPrincipal UserPrincipal principal) {
+      ErrorDto data = this.PostService.delete(principal.getUsername(), postId);
+    
+        return ResponseEntity.status(data.getCode()).body(data);
     }
     
-  
+ 
     
    
 }

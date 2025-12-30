@@ -10,6 +10,7 @@ public class PostErrorsDto {
     private String title;
     private String content;
     private PostEntity post;
+    
     public PostErrorsDto(){
         this.Code = HttpStatus.SC_OK;
         this.Message = "this ops went smouthly";

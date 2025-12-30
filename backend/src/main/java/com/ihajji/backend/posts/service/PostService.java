@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ihajji.backend.posts.dto.ErrorDto;
 import com.ihajji.backend.posts.dto.PostErrorsDto;
 import com.ihajji.backend.posts.dto.PostFeedDto;
 import com.ihajji.backend.posts.dto.PostRequestDTO;
@@ -96,6 +97,38 @@ if (dto.mediaFiles() != null) {
     public List<PostFeedDto> getAllPosts() {
 
         return this.PostRepo.findAllPostFeed();
+    }
+    public ErrorDto delete(String username , Long PostId ){
+        Optional<PostEntity> post = this.PostRepo.findById(PostId);
+        if (!post.isPresent()){
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "the Post does not existe");
+        }
+        if (!post.get().getUser().getUsername().equals(username)){
+                        return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "the post can be deleted by admin or the owner only");
+
+        }
+        this.PostRepo.delete(post.get());
+        
+        return new ErrorDto();
+
+    } 
+    public ErrorDto edit(PostRequestDTO dto , String username){
+        Optional<PostEntity> post = this.PostRepo.findById(dto.ID());
+               if (!post.isPresent()){
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "the Post does not existe");
+        }
+          if (!post.get().getUser().getUsername().equals(username)){
+                        return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "the post can be edited the owner only");
+
+        }
+        PostEntity EditedPost = new PostEntity();
+        EditedPost.setContent(dto.content());
+        EditedPost.setTitle(dto.title());
+        EditedPost.setId(dto.ID());
+
+        this.PostRepo.save(EditedPost);
+
+        return new ErrorDto();
     }
 
     

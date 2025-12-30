@@ -1,10 +1,11 @@
 
 
-  <div class="right-panel">
-    <div class="form-container">
-      <h2>Register</h2>
-
-      <form [formGroup]="registerForm" (ngSubmit)="onregister()">
+ <section class="main-section">
+   <div class="leftPanel"></div>
+  <div class="infoPanel">
+    <h1>O1blog</h1>
+    <form [formGroup]="registerForm" (ngSubmit)="onregister()">
+      <h1>Register</h1>
 
         <div class="input-group">
           <label for="username">Username</label>
@@ -49,9 +50,11 @@
         <button type="submit" [disabled]="registerForm.invalid ">
           Create Account
         </button>
-      <p>Current Status: {{ message() }}</p>
+      <p> {{ message() }}</p>
 
       </form>
-    </div>
-  </div>
+      <h1>already have an account <a [routerLink]="['/login']"> login</a></h1>
 
+
+  </div>
+ </section>

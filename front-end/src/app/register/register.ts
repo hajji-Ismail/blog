@@ -1,11 +1,13 @@
+import { Router } from '@angular/router';
 import { HttpClient } from "@angular/common/http";
 import { Component, OnInit, signal } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { RouterLink } from "@angular/router";
 
 @Component({
     selector: 'register',
     standalone: true, // Check if this is here
-    imports: [ReactiveFormsModule],
+    imports: [ReactiveFormsModule, RouterLink],
     templateUrl: 'register.html',
     styleUrl:'register.css',
 })
@@ -17,7 +19,7 @@ export class register implements OnInit {
   password = signal<String>('')
   message=signal<String>('')
 
-  constructor(private http: HttpClient, private fb: FormBuilder) {}
+  constructor(private http: HttpClient, private fb: FormBuilder, private router : Router) {}
 
   ngOnInit() {
     this.registerForm = this.fb.group({
@@ -32,45 +34,44 @@ export class register implements OnInit {
     this.selectedFile = event.target.files[0];
   }
 
-  onregister() {
-    if (this.registerForm.invalid) {
-      alert("Please fill all fields ");
-      return;
+ onregister() {
+  if (this.registerForm.invalid) {
+    alert("Please fill all fields ");
+    return;
+  }
+
+  const url = "http://localhost:8080/api/v1/Auth/register";
+  const formData = new FormData();
+
+  formData.append('username', this.registerForm.get('username')?.value);
+  formData.append('email', this.registerForm.get('email')?.value);
+  formData.append('password', this.registerForm.get('password')?.value);
+
+  if (this.selectedFile) {
+    formData.append('profileImage', this.selectedFile);
+  }
+
+  this.http.post(url, formData, { withCredentials: true }).subscribe({
+    next: (res) => {
+      console.log('Registration success:', res);
+      this.message.set('Registration successful!');
+      this.router.navigate(['/login']); // navigate to login component
+    },
+    error: (err) => {
+      console.error('Registration error:', err);
+
+      // Safe property access
+      const userError = err?.error?.user;
+      if (userError) {
+        this.message.set(userError.message || 'Error occurred');
+        this.email.set(userError.email || '');
+        this.password.set(userError.password || '');
+        this.username.set(userError.username || '');
+      } else {
+        this.message.set('An unknown error occurred.');
+      }
     }
-
-    const url = "http://localhost:8080/api/v1/Auth/register";
-
-    // 1. Create the FormData envelope
-    const formData = new FormData();
-
-
-    // 2. Add your text fields
-    formData.append('username', this.registerForm.get('username')?.value);
-    formData.append('email', this.registerForm.get('email')?.value);
-    formData.append('password', this.registerForm.get('password')?.value);
-if (this.selectedFile){
-
-  formData.append('profileImage', this.selectedFile);
+  });
 }
 
-
-    // 4. Send it! (Angular automatically sets the correct Headers for FormData)
-    this.http.post(url, formData,{withCredentials: true}).subscribe({
-      next: (res) => alert(res),
-      error: (err) => {
-        console.log(err,'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh');
-
-         this.message.set(err.error.user.message)
-        if (err.error.user.hasErr){
-          this.email.set(err.error.user.email)
-          this.password.set(err.error.user.password)
-          this.username.set(err.error.user.username)
-
-
-        }
-
-      },
-
-    });
-  }
 }
