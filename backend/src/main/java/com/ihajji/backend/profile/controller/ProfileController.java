@@ -12,7 +12,7 @@ import com.ihajji.backend.profile.service.ProfileService;
 import com.ihajji.backend.user.config.UserPrincipal;
 
 @RestController
-@RequestMapping("api/v1/user")
+@RequestMapping("api/v1/user/profile")
 public class ProfileController {
     final ProfileService service;
     ProfileController(ProfileService service){
@@ -20,7 +20,7 @@ public class ProfileController {
     }
 @PostMapping("/follow")
 public ResponseEntity<FollowerDto> follow(@RequestBody FollowerDto dto,@AuthenticationPrincipal UserPrincipal principal){
-FollowerDto response = service.Follow(principal.id(), dto) ;
+FollowerDto response = service.Follow(principal.getUsername(), dto) ;
     return ResponseEntity.status(response.getCode()).body(response);
 
 }

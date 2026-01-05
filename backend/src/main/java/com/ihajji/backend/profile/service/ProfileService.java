@@ -21,8 +21,8 @@ public class ProfileService {
         this.userRepo = userRepo;
     }
 
-    public FollowerDto Follow(Long userId, FollowerDto Dto) {
-        Optional<UserEntity> follower = userRepo.findById(userId);
+    public FollowerDto Follow(String username, FollowerDto Dto) {
+        Optional<UserEntity> follower = userRepo.findByUsername(username);
         if (!follower.isPresent()) {
             return new FollowerDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "midleware is not working properlly");
         }
@@ -31,7 +31,7 @@ public class ProfileService {
         if (!followed.isPresent()) {
             return new FollowerDto(HttpStatus.SC_BAD_REQUEST, "you are following sommeone that it does not exist");
         }
-        if (this.repo.exexistsByFollowerAndFollowed(follower.get(), followed.get())) {
+        if (this.repo.existsByFollowerAndFollowed(follower.get(), followed.get())) {
             repo.deleteByFollowerAndFollowed(follower.get(), followed.get());
             return new FollowerDto();
         }
