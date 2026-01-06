@@ -1,5 +1,7 @@
 package com.ihajji.backend.reports.Entity;
 
+import java.time.LocalDateTime;
+
 import com.ihajji.backend.user.entity.UserEntity;
 
 import jakarta.persistence.Column;
@@ -26,6 +28,14 @@ public class ReportUserEntity {
     private UserEntity reported;
   @Column(name = "reason", nullable = false)
     private String reason;
+        @Column(name = "time_stamp") 
+    private LocalDateTime time = LocalDateTime.now();
+public LocalDateTime getTime() {
+    return time;
+}
+public void setTime(LocalDateTime time) {
+    this.time = time;
+}
 
     public void setId(Long id) {
         this.id = id;

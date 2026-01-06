@@ -1,5 +1,7 @@
 package com.ihajji.backend.reports.Entity;
 
+import java.time.LocalDateTime;
+
 import com.ihajji.backend.posts.entity.PostEntity;
 import com.ihajji.backend.user.entity.UserEntity;
 
@@ -27,7 +29,14 @@ public class ReportPostEntity {
     private PostEntity post;
   @Column(name = "reason", nullable = false)
     private String reason;
-
+    @Column(name = "time_stamp") 
+    private LocalDateTime time = LocalDateTime.now();
+public LocalDateTime getTime() {
+    return time;
+}
+public void setTime(LocalDateTime time) {
+    this.time = time;
+}
 public Long getId() {
     return id;
 }
