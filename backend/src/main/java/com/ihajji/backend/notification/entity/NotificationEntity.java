@@ -25,4 +25,5 @@ public class NotificationEntity {
     private UserEntity receiver;
     
 
+    
 }
