@@ -3,14 +3,19 @@ import { inject } from '@angular/core';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
-  const jwt = getCookie('jwt');
+  const jwt = getCookie('JWT');
+  console.log(jwt);
+  
 
   if (!jwt) return router.parseUrl('/login'); // no token
 
   const payload = decodeJwt(jwt);
+  console.log(payload);
+  
   if (!payload) return router.parseUrl('/login'); // invalid token
 
-  // Check banned
+ console.log("ban");
+
   if (payload.is_banned) return router.parseUrl('/login'); 
 
 
@@ -18,6 +23,7 @@ export const authGuard: CanActivateFn = (route, state) => {
 
   const now = Math.floor(Date.now() / 1000); 
   if (payload.exp < now) return router.parseUrl('/login');
+console.log("hi");
 
   return true; // everything is valid
 };

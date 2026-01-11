@@ -1,1 +1,49 @@
-<p>post works!</p>
+@if (posts(); as postList) {
+  @for (post of postList; track post.id) {
+    <div class="post-item" style="border: 1px solid #ddd; margin-bottom: 20px; padding: 15px; border-radius: 8px;">
+      
+      <div class="post-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <img [src]="post.profileImageUrl || 'assets/default-avatar.png'" 
+             alt="Profile" 
+             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+        <div>
+          <strong style="display: block;">{{ post.username }}</strong>
+          <small class="text-muted">{{ post.createdAt | date:'medium' }}</small>
+        </div>
+      </div>
+
+      <div class="post-body">
+        <h3 style="margin: 5px 0;">{{ post.title }}</h3>
+        <p>{{ post.content }}</p>
+      </div>
+
+      @if (post.medias && post.medias.length > 0) {
+        <div class="post-media" style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 5px;">
+          @for (m of post.medias; track $index) {
+            <img [src]="m.media" 
+                 alt="Post media" 
+                 style="max-width: 100%; border-radius: 4px; max-height: 400px;">
+          }
+        </div>
+      }
+
+      <div class="post-footer" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
+        <span style="margin-right: 20px;">
+          👍 <strong>{{ post.reactionCount }}</strong> Reactions
+        </span>
+        <span>
+          💬 <strong>{{ post.commentCount }}</strong> Comments
+        </span>
+      </div>
+
+    </div>
+  } @empty {
+    <div class="no-posts">
+      <p>No posts available.</p>
+    </div>
+  }
+} @else {
+  <div class="loading">
+    <p>Loading posts...</p>
+  </div>
+}

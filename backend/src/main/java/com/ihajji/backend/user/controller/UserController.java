@@ -54,7 +54,7 @@ public ResponseEntity<AuthResponse> register(@Valid @ModelAttribute CreateUserDt
             return ResponseEntity.status(saved.getUser().getCode()).body(saved);
         }
        ResponseCookie jwtCookie = ResponseCookie.from("JWT", saved.getAccessToken())
-                    .httpOnly(true)
+                    .httpOnly(false)
                     .secure(false)
                     .path("/")
                     .maxAge(24 * 60 * 60)
@@ -78,7 +78,7 @@ public ResponseEntity<AuthResponse> register(@Valid @ModelAttribute CreateUserDt
                 return ResponseEntity.status(AuthResponse.getUser().getCode()).body(AuthResponse);
             }
             ResponseCookie jwtCookie = ResponseCookie.from("JWT", AuthResponse.getAccessToken())
-                    .httpOnly(true)
+                    .httpOnly(false)
                     .secure(false)
                     .path("/")
                     .maxAge(24 * 60 * 60)

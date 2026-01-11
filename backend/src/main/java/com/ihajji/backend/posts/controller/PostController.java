@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ihajji.backend.posts.dto.ErrorDto;
 import com.ihajji.backend.posts.dto.PostErrorsDto;
 import com.ihajji.backend.posts.dto.PostFeedDto;
+import com.ihajji.backend.posts.dto.PostFeedResponse;
 import com.ihajji.backend.posts.dto.PostRequestDTO;
 import com.ihajji.backend.posts.service.PostService;
 
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@RequestMapping("api/v1/user/Post")
+@RequestMapping("api/v1/user/post")
 public class PostController {
       private final PostService PostService;
       PostController(PostService PostService){
@@ -35,7 +36,7 @@ public class PostController {
     @PostMapping("save")
     public ResponseEntity<PostErrorsDto> save(@ModelAttribute PostRequestDTO dto, @AuthenticationPrincipal UserPrincipal principal) {
       
-        PostErrorsDto post = this.PostService.SavePost(dto, principal.getUsername());
+        PostErrorsDto post = this.PostService.savePost(dto, principal.getUsername());
         
       
         
@@ -43,8 +44,8 @@ public class PostController {
         
     }
     @GetMapping("/load")
-    public ResponseEntity<List<PostFeedDto>> Load() {
-      List<PostFeedDto> Post =this.PostService.getAllPosts();
+    public ResponseEntity<List<PostFeedResponse>> Load() {
+      List<PostFeedResponse> Post =this.PostService.getPostFeed();
       return ResponseEntity.ok(Post);
        
     }
