@@ -1,0 +1,59 @@
+import { CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+
+export const authGuard: CanActivateFn = (route, state) => {
+  const router = inject(Router);
+  const jwt = getCookie('jwt');
+
+  if (!jwt) return router.parseUrl('/login'); // no token
+
+  const payload = decodeJwt(jwt);
+  if (!payload) return router.parseUrl('/login'); // invalid token
+
+  // Check banned
+  if (payload.is_banned) return router.parseUrl('/login'); 
+
+
+
+
+  const now = Math.floor(Date.now() / 1000); 
+  if (payload.exp < now) return router.parseUrl('/login');
+
+  return true; // everything is valid
+};
+export const roleGuard: CanActivateFn = (route, state) => {
+  const router = inject(Router);
+
+  // 1. Get required role from route data
+  const requiredRole = route.data['role'] as string;
+
+  // 2. Get JWT from cookie
+  const jwt = getCookie('jwt');
+  if (!jwt) return router.parseUrl('/login');
+
+  // 3. Decode JWT
+  const payload = decodeJwt(jwt);
+  if (!payload) return router.parseUrl('/login');
+
+  // 4. Check role
+  if (payload.role !== requiredRole) {
+    return router.parseUrl('/login'); // user cannot enter
+  }
+
+  return true; 
+};
+// Helper functions
+function getCookie(name: string): string | null {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
+function decodeJwt(token: string): any {
+  try {
+    const payload = token.split('.')[1];
+    const decoded = atob(payload);
+    return JSON.parse(decoded);
+  } catch (e) {
+    return null;
+  }
+}

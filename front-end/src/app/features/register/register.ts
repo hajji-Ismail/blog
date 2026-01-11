@@ -55,7 +55,7 @@ export class register implements OnInit {
     next: (res) => {
       console.log('Registration success:', res);
       this.message.set('Registration successful!');
-      this.router.navigate(['/login']); // navigate to login component
+      this.router.navigate(['/']); // navigate to login component
     },
     error: (err) => {
       console.error('Registration error:', err);

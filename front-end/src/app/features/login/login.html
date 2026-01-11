@@ -1,0 +1,56 @@
+<!-- container-fluid makes it full width; vh-100 centers it vertically on the screen -->
+<section class="container-fluid vh-100 d-flex align-items-center bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      
+      <div class="col-12 col-md-6 col-lg-4">
+        
+        <!-- 'card' adds a white box, 'shadow' adds depth -->
+        <div class="card shadow p-4">
+          <div class="card-body">
+            <h2 class="text-center mb-4">Log in</h2>
+
+            <!-- mb-3 adds a standard margin-bottom -->
+            <div class="mb-3">
+              <label for="identifier" class="form-label">Username or Email</label>
+              <input
+                #identifier
+                type="text"
+                id="identifier"
+                class="form-control" 
+                placeholder="Enter username or email">
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input
+                #password
+                type="password"
+                id="password"
+                class="form-control"
+                placeholder="••••••••">
+            </div>
+
+            <!-- btn-primary makes it blue, w-100 makes it full width -->
+            <button
+              type="button"
+              class="btn btn-primary w-100 mt-2"
+              (click)="onlogin(identifier.value, password.value)">
+              Log in
+            </button>
+            <p class="text-center mt-3 text-danger"> {{ message() }}</p>
+
+            <!-- Text-center and small font size for the footer -->
+            <div class="text-center mt-4">
+              <p class="text-muted">
+                Don't have an account? 
+                <a [routerLink]="['/register']" class="text-decoration-none">Register</a>
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
