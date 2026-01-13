@@ -11,6 +11,11 @@ import com.ihajji.backend.profile.dto.FollowerDto;
 import com.ihajji.backend.profile.service.ProfileService;
 import com.ihajji.backend.user.config.UserPrincipal;
 
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.ihajji.backend.profile.dto.userDto;
+
+
 @RestController
 @RequestMapping("api/v1/user/profile")
 public class ProfileController {
@@ -24,5 +29,13 @@ FollowerDto response = service.Follow(principal.getUsername(), dto) ;
     return ResponseEntity.status(response.getCode()).body(response);
 
 }
+@GetMapping("/user")
+public ResponseEntity<userDto> getMethodName(@AuthenticationPrincipal UserPrincipal principal) {
+    System.out.println("i am heeeer");
+    userDto response = this.service.loadUserProfile(principal.getUsername()) ;
+    return ResponseEntity.status(response.getCode()).body(response);
+}
+
+
     
 }

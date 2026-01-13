@@ -1,25 +1,22 @@
 package com.ihajji.backend.posts.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ihajji.backend.posts.dto.ErrorDto;
 import com.ihajji.backend.posts.dto.PostErrorsDto;
-import com.ihajji.backend.posts.dto.PostFeedDto;
 import com.ihajji.backend.posts.dto.PostFeedResponse;
 import com.ihajji.backend.posts.dto.PostRequestDTO;
 import com.ihajji.backend.posts.service.PostService;
-
 import com.ihajji.backend.user.config.UserPrincipal;
-
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -33,12 +30,14 @@ public class PostController {
       PostController(PostService PostService){
         this.PostService = PostService;
       }
-    @PostMapping("save")
+    @PostMapping("/save")
     public ResponseEntity<PostErrorsDto> save(@ModelAttribute PostRequestDTO dto, @AuthenticationPrincipal UserPrincipal principal) {
-      
+          System.out.println("hhhhhhhhhhhhhhhhhhhhhiiiiiiiiuojihghguigukhgziuxchiaus");
+
         PostErrorsDto post = this.PostService.savePost(dto, principal.getUsername());
         
-      
+          System.out.println("hhhhhhhhhhhhhhhhhhhhhiiiiiiiiuojihghguigukhgziuxchiaus");
+
         
         return ResponseEntity.status(post.getCode()).body(post);
         

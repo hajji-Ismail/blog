@@ -1,0 +1,20 @@
+<ul>
+  <li *ngFor="let item of menuItems">
+    <a [routerLink]="item.route">{{ item.label }}</a>
+  </li>
+
+  <li *ngIf="auth.hasRole('ADMIN')">
+    <a routerLink="/admin">Admin</a>
+  </li>
+  @if (profile()) {
+  <li>
+    <img [src]="profile()?.profile || 'assets/images/default-avatar.png'" alt="User Profile" />
+    <a routerLink="/profle">Profile</a>
+  </li>
+
+  }
+
+</ul>
+<main style="flex: 1; padding: 20px;">
+  <router-outlet></router-outlet> <!-- Child routes (like Posts) will appear here -->
+</main>

@@ -86,6 +86,7 @@ public class PostService {
     }
 
     post.setMedias(mediaEntities);
+    System.out.println("hhhhhhhhhhhhhhhhhhhhhiiiiiiiiuojihghguigukhgziuxchiaus");
 
     PostEntity savedPost = PostRepo.save(post);
     errors.setPost(savedPost);

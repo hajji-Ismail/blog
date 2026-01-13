@@ -6,10 +6,11 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.ihajji.backend.profile.dto.FollowerDto;
+import com.ihajji.backend.profile.dto.userDto;
 import com.ihajji.backend.profile.entity.ProfileEntity;
 import com.ihajji.backend.profile.repository.ProfileRepository;
-import com.ihajji.backend.user.repository.UserRepository;
 import com.ihajji.backend.user.entity.UserEntity;
+import com.ihajji.backend.user.repository.UserRepository;
 
 @Service
 public class ProfileService {
@@ -43,4 +44,13 @@ public class ProfileService {
         return new FollowerDto();
 
     }
+    public userDto loadUserProfile(String username){
+        Optional<UserEntity> user = this.userRepo.findByUsername(username);
+        if (!user.isPresent()){
+            return new userDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "the midleware isn't working");
+        }
+        return new userDto(user.get().getUsername(), user.get().getProfileImageUrl());
+
+    }
+ 
 }
