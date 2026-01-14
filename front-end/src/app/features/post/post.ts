@@ -2,6 +2,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PostFeedDto } from './models/Post.models';
 import { DatePipe } from '@angular/common';
+import { getProfileImage } from '../../services/profile.service';
 
 
 @Component({
@@ -26,5 +27,8 @@ export class Posts implements OnInit {
           this.posts.set([]);
         }
       });
+  }
+ getProfileImage(url: string | null | undefined) {
+    return getProfileImage(url);
   }
 }

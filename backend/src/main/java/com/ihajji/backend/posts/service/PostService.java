@@ -2,8 +2,6 @@ package com.ihajji.backend.posts.service;
 
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -88,8 +86,8 @@ public class PostService {
     post.setMedias(mediaEntities);
     System.out.println("hhhhhhhhhhhhhhhhhhhhhiiiiiiiiuojihghguigukhgziuxchiaus");
 
-    PostEntity savedPost = PostRepo.save(post);
-    errors.setPost(savedPost);
+     PostRepo.save(post);
+   
 
     return errors;
 }

@@ -38,7 +38,9 @@ public class PostController {
         
           System.out.println("hhhhhhhhhhhhhhhhhhhhhiiiiiiiiuojihghguigukhgziuxchiaus");
 
-        
+        System.out.print(post.getCode());
+                System.out.print("PostCode kjshgysgksdgfuyadgfhadgfjkasdbduhykgz");
+
         return ResponseEntity.status(post.getCode()).body(post);
         
     }

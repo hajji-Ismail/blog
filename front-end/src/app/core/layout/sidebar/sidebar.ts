@@ -4,12 +4,13 @@ import { RouterLink, RouterOutlet } from "@angular/router";
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ProfilePecture } from './model/profile.model';
+import { getProfileImage } from '../../../services/profile.service';
 
 @Component({
   selector: 'app-sidebar',
   imports: [RouterLink, CommonModule, RouterOutlet],
-  templateUrl: './sidebar.html',
-  styleUrl: './sidebar.css',
+  templateUrl: 'sidebar.html',
+  styleUrl: 'sidebar.css',
 })
 export class Sidebar {
   profile = signal<ProfilePecture|null>(null);
@@ -37,6 +38,9 @@ export class Sidebar {
           }
         });
     }
+    getProfileImage(url: string | null | undefined) {
+        return getProfileImage(url);
+      }
   }
 
 

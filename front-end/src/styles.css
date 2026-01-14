@@ -1,4 +1,38 @@
-* {
-  margin: 0;
-  padding: 0;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --sidebar-width: 280px;
+  --bg-light: #f8f9fa;
+  --border-color: #dee2e6;
+  --primary-color: #0d6efd;
+  --transition-speed: 0.3s;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-light);
+  color: #212529;
+}
+
+/* Layout Wrapper - Usually in app.component.html */
+.main-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Content adjustment for fixed sidebar */
+.content-area {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  padding: 2rem;
+  transition: margin var(--transition-speed);
+}
+
+@media (max-width: 992px) {
+  :root { --sidebar-width: 80px; }
+}
+
+@media (max-width: 768px) {
+  :root { --sidebar-width: 0px; }
+  .content-area { margin-left: 0; padding: 1rem; }
 }

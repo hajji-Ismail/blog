@@ -1,20 +1,51 @@
-<ul>
-  <li *ngFor="let item of menuItems">
-    <a [routerLink]="item.route">{{ item.label }}</a>
-  </li>
+<div class="main-wrapper">
+<nav class="sidebar-nav bg-white shadow-sm vh-100 position-fixed">
+  <div class="sidebar-header p-3 border-bottom">
+    <h1 class="h3 fw-bold text-dark mb-0">01Blog</h1>
+  </div>
+  
+  <ul class="nav flex-column p-3">
+    <!-- Menu Items -->
+    @for (item of menuItems; track item.label) {
+      <li class="nav-item mb-1">
+        <a class="nav-link menu-link d-flex align-items-center rounded" 
+           [routerLink]="item.route"
+           routerLinkActive="active bg-light">
+          <i class="fas fa-fw me-2" [class]="item.label"></i>
+          <span class="nav-text fw-medium">{{ item.label }}</span>
+        </a>
+      </li>
+    }
 
-  <li *ngIf="auth.hasRole('ADMIN')">
-    <a routerLink="/admin">Admin</a>
-  </li>
-  @if (profile()) {
-  <li>
-    <img [src]="profile()?.profile || 'assets/images/default-avatar.png'" alt="User Profile" />
-    <a routerLink="/profle">Profile</a>
-  </li>
+    <!-- Admin Link -->
+    @if (auth.hasRole('ADMIN')) {
+      <li class="nav-item mb-1">
+        <a class="nav-link menu-link d-flex align-items-center rounded" 
+           routerLink="/admin"
+           routerLinkActive="active bg-light">
+          <i class="fas fa-user-shield fa-fw me-2"></i>
+          <span class="nav-text fw-medium">Admin</span>
+        </a>
+      </li>
+    }
 
-  }
+    <!-- Profile -->
+    @if (profile()) {
+      <li class="nav-item mt-3 pt-2 border-top">
+        <a class="nav-link menu-link d-flex align-items-center rounded" 
+           routerLink="/profile"
+           routerLinkActive="active bg-light">
+          <img [src]="getProfileImage(profile()?.profile)" 
+               alt="User Profile" 
+               class="rounded-circle me-2 profile-thumb">
+          <span class="nav-text fw-medium">Profile</span>
+        </a>
+      </li>
+    }
+  </ul>
+</nav>
 
-</ul>
-<main style="flex: 1; padding: 20px;">
-  <router-outlet></router-outlet> <!-- Child routes (like Posts) will appear here -->
-</main>
+<main class="content-area">
+    <router-outlet></router-outlet>
+  </main>
+</div>
