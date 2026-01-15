@@ -36,27 +36,34 @@ export class Posts implements OnInit {
   }
 
 
-  onComment(postId: number, content: string) {
-    this.http
-      .post(
-        'http://localhost:8080/api/v1/user/comment/save',
-        { postId, content },
-        { withCredentials: true }
-      )
-      .subscribe({
-        next: _ => {
-          // ✅ update ONLY the matching post
-          this.posts.update(posts =>
-            posts.map(post =>
-              post.id === postId
-                ? { ...post, commentCount: post.commentCount + 1 }
-                : post
-            )
-          );
-        },
-        error: err => console.error(err),
-      });
-  }
+ onComment(postId: number, input: HTMLInputElement) {
+  const content = input.value.trim();
+  if (!content) return;
+
+  this.http
+    .post(
+      'http://localhost:8080/api/v1/user/comment/save',
+      { postId, content },
+      { withCredentials: true }
+    )
+    .subscribe({
+      next: _ => {
+        // update comment count
+        this.posts.update(posts =>
+          posts.map(post =>
+            post.id === postId
+              ? { ...post, commentCount: post.commentCount + 1 }
+              : post
+          )
+        );
+
+        // clear input after success
+        input.value = '';
+      },
+      error: err => console.error(err),
+    });
+}
+
   onReact(postId: number){
       this.http
       .post(

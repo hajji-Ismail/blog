@@ -1,28 +1,72 @@
-<div>
-  <div>
-    <H1>01Blog
-      
-    </H1>
-  </div>
-  <ul>
-  <li *ngFor="let item of menuItems">
-    <a [routerLink]="item.route">{{ item.label }}</a>
-  </li>
+<!-- Google Material Symbols (Outlined) -->
 
-  <li *ngIf="auth.hasRole('ADMIN')">
-    <a routerLink="/admin">Admin</a>
-  </li>
-  @if (profile()) {
-  <li>
-    <img [src]=" getProfileImage(profile()?.profile)" alt="User Profile" />
-    <a routerLink="/profle">Profile</a>
-  </li>
+<div class="d-flex" style="min-height: 100vh;">
 
-  }
+  <!-- SIDEBAR -->
+  <aside
+    class="bg-white border-end p-4 d-flex flex-column"
+    style="width: 260px; position: sticky; top: 0; height: 100vh; overflow-y: auto;"
+  >
 
-</ul>
+    <!-- Logo -->
+    <div class="mb-4">
+      <h1
+        class="fw-bold"
+        style="font-family: 'Playfair Display', serif; color: #0d6efd;"
+      >
+        01Blog
+      </h1>
+    </div>
+
+    <!-- Menu -->
+    <ul class="list-unstyled flex-grow-1">
+
+      <li *ngFor="let item of menuItems" class="mb-3">
+        <a
+          [routerLink]="item.route"
+          class="text-decoration-none text-black fw-medium d-flex align-items-center gap-2"
+        >
+          <!-- Correct icon rendering -->
+<span class="material-symbols-outlined" style="font-family: 'Material Symbols Outlined';">
+  chevron_right
+</span>
+          {{ item.label }}
+        </a>
+      </li>
+
+      <li *ngIf="auth.hasRole('ADMIN')" class="mb-3">
+        <a
+          routerLink="/admin"
+          class="text-decoration-none text-black fw-medium d-flex align-items-center gap-2"
+        >
+          <span class="material-symbols-outlined">admin_panel_settings</span>
+          Admin
+        </a>
+      </li>
+
+    </ul>
+
+    <!-- Profile Section -->
+    <div *ngIf="profile()" class="border-top pt-3 d-flex align-items-center gap-3">
+      <img
+        [src]="getProfileImage(profile()?.profile) || '/assets/default-profile.png'"
+        alt="User Profile"
+        class="rounded-circle"
+        style="width: 42px; height: 42px; object-fit: cover;"
+      />
+      <a
+        routerLink="/profle"
+        class="text-decoration-none text-black fw-medium"
+      >
+        {{ profile()?.username }}
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-grow-1 p-4 bg-white text-black" style="overflow-y: auto;">
+    <router-outlet></router-outlet>
+  </main>
+
 </div>
-
-<main style="flex: 1; padding: 20px;">
-  <router-outlet></router-outlet> <!-- Child routes (like Posts) will appear here -->
-</main>

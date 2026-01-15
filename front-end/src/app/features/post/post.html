@@ -1,74 +1,119 @@
-@if (posts(); as postList) {
-@for (post of postList; track post.id) {
-<div class="post-item" style="border: 1px solid #ddd; margin-bottom: 20px; padding: 15px; border-radius: 8px;">
-
-  <div class="post-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-    <img [src]="getProfileImage(post.profileImageUrl)" alt="Profile"
-      style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-    <div>
-      <strong style="display: block;">{{ post.username }}</strong>
-      <small class="text-muted">{{ post.createdAt | date:'medium' }}</small>
-    </div>
-  </div>
-
-  <div class="post-body">
-    <h3 style="margin: 5px 0;">{{ post.title }}</h3>
-    <p>{{ post.content }}</p>
-  </div>
-
-  @if (post.medias && post.medias.length > 0) {
-  <div class="post-media" style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 5px;">
-    @for (m of post.medias; track $index) {
-    <img [src]="m" alt="Post media" style="max-width: 100%; border-radius: 4px; max-height: 400px;">
-    }
-  </div>
-  }
-
-  <div class="post-footer" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
-    <button type="button" (click)="onReact(post.id )">
-      <span>
-        <strong>{{ post.reactionCount}}</strong> Reactions
-      </span>
-    </button>
-    <button type="button" , (click)="onDisplay(post.id)">
-
-      <span>
-        <strong>{{ post.commentCount}}</strong> Comments
-      </span>
-    </button>
-    <div>
-      <input type="text" id="comment" #comment>
-      <button type="button" (click)="onComment(post.id , comment.value)"></button>
-    </div>
-
-  </div>
-  <div *ngIf="post.display" class="comments-section"
-    style="margin-top: 10px; padding-left: 10px; border-left: 2px solid #ddd;">
+<!-- BOOTSTRAP + ICONS -->
 
 
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12 col-md-8 mx-auto">
 
-    <!-- List of comments -->
-    <div *ngFor="let comment of post.comments" class="comment-item"
-      style="margin-bottom: 8px; padding: 5px; border-radius: 4px; background: #f8f8f8;">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <img [src]="comment.profileImageUrl || '/assets/default-profile.png'" alt="User"
-          style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
-        <strong>{{ comment.username || 'Anonymous' }}</strong>
-        <small class="text-muted" style="margin-left: auto;">{{ comment.createdAt | date:'short' }}</small>
+      <div
+        *ngFor="let post of posts()"
+        class="card mb-4 shadow-sm"
+      >
+        <!-- POST HEADER -->
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <img
+              [src]="getProfileImage(post.profileImageUrl)"
+              class="rounded-circle me-2"
+              width="40"
+              height="40"
+              alt="profile"
+            />
+            <div>
+              <strong>{{ post.username }}</strong><br />
+              <small class="text-muted">
+                {{ post.createdAt | date:'medium' }}
+              </small>
+            </div>
+          </div>
+
+          <h5 class="card-title">{{ post.title }}</h5>
+          <p class="card-text">{{ post.content }}</p>
+        </div>
+
+        <!-- MEDIA -->
+        <div *ngIf="post.medias?.length" class="px-3 pb-2">
+          <img
+            *ngFor="let m of post.medias"
+            [src]="m"
+            class="img-fluid rounded mb-2"
+            alt="media"
+          />
+        </div>
+
+        <!-- ACTION BAR -->
+        <div
+          class="card-footer bg-white d-flex align-items-center gap-4"
+        >
+          <!-- REACTION -->
+          <button
+            class="btn btn-link p-0 d-flex align-items-center gap-1"
+            (click)="onReact(post.id)"
+            [ngStyle]="{ color: post.reacted ? 'red' : 'black' }"
+          >
+            <i class="bi bi-heart-fill fs-5"></i>
+            <span>{{ post.reactionCount }}</span>
+          </button>
+
+          <!-- COMMENT TOGGLE -->
+          <button
+            class="btn btn-link p-0 d-flex align-items-center gap-1 text-black"
+            (click)="onDisplay(post.id)"
+          >
+            <i class="bi bi-chat fs-5"></i>
+            <span>{{ post.commentCount }}</span>
+          </button>
+        </div>
+        <div class="d-flex gap-2 mt-3">
+            <input
+              type="text"
+              #comment
+              class="form-control"
+              placeholder="Write a comment..."
+            />
+            <button
+              class="btn btn-link p-0 text-black"
+              (click)="onComment(post.id, comment); comment.value=''"
+            >
+              <i class="bi bi-send-fill fs-5"></i>
+            </button>
+          </div>
+
+        <!-- COMMENTS SECTION -->
+        <div *ngIf="post.display" class="p-3 border-top">
+
+          <!-- COMMENT LIST -->
+          <div
+            *ngFor="let comment of post.comments"
+            class="mb-3"
+          >
+            <div class="d-flex align-items-start gap-2">
+              <img
+                [src]="getProfileImage(comment.profileImageUrl)"
+                class="rounded-circle"
+                width="32"
+                height="32"
+                alt="user"
+              />
+
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between">
+                  <strong>{{ comment.username || 'Anonymous' }}</strong>
+                  <small class="text-muted">
+                    {{ comment.createdAt | date:'short' }}
+                  </small>
+                </div>
+                <p class="mb-1">{{ comment.content }}</p>
+              </div>
+            </div>
+          </div>
+
+          
+          
+
+        </div>
       </div>
-      <p style="margin-left: 38px; margin-top: 2px;">{{ comment.content }}</p>
+
     </div>
-
   </div>
-
 </div>
-} @empty {
-<div class="no-posts">
-  <p>No posts available.</p>
-</div>
-}
-} @else {
-<div class="loading">
-  <p>Loading posts...</p>
-</div>
-}
