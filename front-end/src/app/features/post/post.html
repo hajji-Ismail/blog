@@ -3,7 +3,7 @@
     <div class="post-item" style="border: 1px solid #ddd; margin-bottom: 20px; padding: 15px; border-radius: 8px;">
       
       <div class="post-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-        <img [src]="post.profileImageUrl || 'assets/default-avatar.png'" 
+        <img [src]="getProfileImage(post.profileImageUrl)" 
              alt="Profile" 
              style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
         <div>
@@ -20,7 +20,7 @@
       @if (post.medias && post.medias.length > 0) {
         <div class="post-media" style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 5px;">
           @for (m of post.medias; track $index) {
-            <img [src]="m.media" 
+            <img [src]="m" 
                  alt="Post media" 
                  style="max-width: 100%; border-radius: 4px; max-height: 400px;">
           }
@@ -28,12 +28,19 @@
       }
 
       <div class="post-footer" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
-        <span style="margin-right: 20px;">
-          👍 <strong>{{ post.reactionCount }}</strong> Reactions
+       <button type="button" (click)="onReact(post.id )">
+         <span>
+           <strong>{{ post.reactionCount}}</strong> Reactions
         </span>
+       </button>
         <span>
-          💬 <strong>{{ post.commentCount }}</strong> Comments
+           <strong>{{ post.commentCount}}</strong> Comments
         </span>
+        <div>
+          <input type="text" id="comment" #comment>
+          <button type="button" (click)="onComment(post.id , comment.value)"></button>
+        </div>
+
       </div>
 
     </div>

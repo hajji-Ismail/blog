@@ -32,14 +32,11 @@ public class PostController {
       }
     @PostMapping("/save")
     public ResponseEntity<PostErrorsDto> save(@ModelAttribute PostRequestDTO dto, @AuthenticationPrincipal UserPrincipal principal) {
-          System.out.println("hhhhhhhhhhhhhhhhhhhhhiiiiiiiiuojihghguigukhgziuxchiaus");
 
         PostErrorsDto post = this.PostService.savePost(dto, principal.getUsername());
         
-          System.out.println("hhhhhhhhhhhhhhhhhhhhhiiiiiiiiuojihghguigukhgziuxchiaus");
 
-        System.out.print(post.getCode());
-                System.out.print("PostCode kjshgysgksdgfuyadgfhadgfjkasdbduhykgz");
+
 
         return ResponseEntity.status(post.getCode()).body(post);
         

@@ -37,6 +37,8 @@ public class PostService {
 
     }
    public PostErrorsDto savePost(PostRequestDTO dto, String username) {
+System.out.print("file HHHHHHHHHHHHHHHHAAAAAAAAAAAAAAAAAAAARRRRRRRRRRRRRAAAAAAAAAANNNNNNNNIIIIIIIIIIII");
+System.out.println(dto.mediaFiles().get(0).getOriginalFilename());
 
     PostErrorsDto errors = new PostErrorsDto();
 
@@ -72,8 +74,9 @@ public class PostService {
 
                 MediaEntity media = new MediaEntity();
                 media.setMedia(url);
-                media.setPost(post);      // owning side
-                mediaEntities.add(media); // inverse side
+                media.setPost(post);      
+                mediaEntities.add(media); 
+            
 
             } catch (IOException e) {
                 errors.setCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -84,7 +87,6 @@ public class PostService {
     }
 
     post.setMedias(mediaEntities);
-    System.out.println("hhhhhhhhhhhhhhhhhhhhhiiiiiiiiuojihghguigukhgziuxchiaus");
 
      PostRepo.save(post);
    

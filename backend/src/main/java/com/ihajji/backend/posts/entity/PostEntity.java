@@ -41,7 +41,12 @@ public class PostEntity {
 @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
 private Set<CommentEntity> comments = new HashSet<>();
 
-@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+@OneToMany(
+    mappedBy = "post",
+    cascade = CascadeType.ALL,
+    orphanRemoval = true,
+    fetch = FetchType.LAZY
+)
 private Set<MediaEntity> medias = new HashSet<>();
 
     @CreatedDate
