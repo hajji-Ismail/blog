@@ -12,5 +12,6 @@ public record PostFeedResponse(
     int reactionCount,
     int commentCount,
     LocalDateTime createdAt,
-    List<String> medias // Just a simple list of URLs
+    List<String> medias ,
+    boolean reacted
 ) {}

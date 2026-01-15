@@ -1,56 +1,74 @@
 @if (posts(); as postList) {
-  @for (post of postList; track post.id) {
-    <div class="post-item" style="border: 1px solid #ddd; margin-bottom: 20px; padding: 15px; border-radius: 8px;">
-      
-      <div class="post-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-        <img [src]="getProfileImage(post.profileImageUrl)" 
-             alt="Profile" 
-             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-        <div>
-          <strong style="display: block;">{{ post.username }}</strong>
-          <small class="text-muted">{{ post.createdAt | date:'medium' }}</small>
-        </div>
-      </div>
+@for (post of postList; track post.id) {
+<div class="post-item" style="border: 1px solid #ddd; margin-bottom: 20px; padding: 15px; border-radius: 8px;">
 
-      <div class="post-body">
-        <h3 style="margin: 5px 0;">{{ post.title }}</h3>
-        <p>{{ post.content }}</p>
-      </div>
-
-      @if (post.medias && post.medias.length > 0) {
-        <div class="post-media" style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 5px;">
-          @for (m of post.medias; track $index) {
-            <img [src]="m" 
-                 alt="Post media" 
-                 style="max-width: 100%; border-radius: 4px; max-height: 400px;">
-          }
-        </div>
-      }
-
-      <div class="post-footer" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
-       <button type="button" (click)="onReact(post.id )">
-         <span>
-           <strong>{{ post.reactionCount}}</strong> Reactions
-        </span>
-       </button>
-        <span>
-           <strong>{{ post.commentCount}}</strong> Comments
-        </span>
-        <div>
-          <input type="text" id="comment" #comment>
-          <button type="button" (click)="onComment(post.id , comment.value)"></button>
-        </div>
-
-      </div>
-
+  <div class="post-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+    <img [src]="getProfileImage(post.profileImageUrl)" alt="Profile"
+      style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+    <div>
+      <strong style="display: block;">{{ post.username }}</strong>
+      <small class="text-muted">{{ post.createdAt | date:'medium' }}</small>
     </div>
-  } @empty {
-    <div class="no-posts">
-      <p>No posts available.</p>
-    </div>
-  }
-} @else {
-  <div class="loading">
-    <p>Loading posts...</p>
   </div>
+
+  <div class="post-body">
+    <h3 style="margin: 5px 0;">{{ post.title }}</h3>
+    <p>{{ post.content }}</p>
+  </div>
+
+  @if (post.medias && post.medias.length > 0) {
+  <div class="post-media" style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 5px;">
+    @for (m of post.medias; track $index) {
+    <img [src]="m" alt="Post media" style="max-width: 100%; border-radius: 4px; max-height: 400px;">
+    }
+  </div>
+  }
+
+  <div class="post-footer" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
+    <button type="button" (click)="onReact(post.id )">
+      <span>
+        <strong>{{ post.reactionCount}}</strong> Reactions
+      </span>
+    </button>
+    <button type="button" , (click)="onDisplay(post.id)">
+
+      <span>
+        <strong>{{ post.commentCount}}</strong> Comments
+      </span>
+    </button>
+    <div>
+      <input type="text" id="comment" #comment>
+      <button type="button" (click)="onComment(post.id , comment.value)"></button>
+    </div>
+
+  </div>
+  <div *ngIf="post.display" class="comments-section"
+    style="margin-top: 10px; padding-left: 10px; border-left: 2px solid #ddd;">
+
+
+
+    <!-- List of comments -->
+    <div *ngFor="let comment of post.comments" class="comment-item"
+      style="margin-bottom: 8px; padding: 5px; border-radius: 4px; background: #f8f8f8;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <img [src]="comment.profileImageUrl || '/assets/default-profile.png'" alt="User"
+          style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+        <strong>{{ comment.username || 'Anonymous' }}</strong>
+        <small class="text-muted" style="margin-left: auto;">{{ comment.createdAt | date:'short' }}</small>
+      </div>
+      <p style="margin-left: 38px; margin-top: 2px;">{{ comment.content }}</p>
+    </div>
+
+  </div>
+
+</div>
+} @empty {
+<div class="no-posts">
+  <p>No posts available.</p>
+</div>
+}
+} @else {
+<div class="loading">
+  <p>Loading posts...</p>
+</div>
 }

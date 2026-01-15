@@ -8,4 +8,16 @@ export interface PostFeedDto {
   reactionCount: number;
   commentCount: number;  
   medias: { media: string }[]; 
+  reacted: boolean
+  display: boolean 
+  comments : CommentDto[]
+}
+ export interface CommentDto {
+  id: number;               
+  postId: number;          
+  userId: number;           
+  content: string;         
+  createdAt: string;        
+  username?: string;        
+  profileImageUrl?: string;
 }

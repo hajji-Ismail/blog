@@ -5,39 +5,29 @@ import java.util.List;
 
 import org.apache.hc.core5.http.HttpStatus;
 
-import com.ihajji.backend.posts.entity.CommentEntity;
-
 public class ErrorDto {
     private int code;
-    private String Message;
-    private List<CommentEntity> comments;
-    public ErrorDto(){
-        this.Message = "this ops went smouthly";
-        this.code  = HttpStatus.SC_OK;
-        this.comments = new ArrayList<CommentEntity>();
-    }
-     public ErrorDto(int code ,String Message ){
-        this.Message = Message;
-        this.code  = code;
+    private String message;
+    private List<CommentDto> comments;
+
+    public ErrorDto() {
+        this.message = "Operation completed successfully";
+        this.code = HttpStatus.SC_OK;
+        this.comments = new ArrayList<>();
     }
 
-    public int getCode() {
-        return code;
-    }
-    public List<CommentEntity> getComments() {
-        return comments;
-    }
-    public String getMessage() {
-        return Message;
-    }
-    public void setCode(int code) {
+    public ErrorDto(int code, String message) {
         this.code = code;
+        this.message = message;
+        this.comments = new ArrayList<>();
     }
-    public void setMessage(String message) {
-        Message = message;
-    }
-public void setComments(List<CommentEntity> comments) {
-    this.comments = comments;
-}
-    
+
+    // getters & setters
+    public int getCode() { return code; }
+    public String getMessage() { return message; }
+    public List<CommentDto> getComments() { return comments; }
+
+    public void setCode(int code) { this.code = code; }
+    public void setMessage(String message) { this.message = message; }
+    public void setComments(List<CommentDto> comments) { this.comments = comments; }
 }

@@ -2,6 +2,8 @@ package com.ihajji.backend.posts.controller;
 
 import java.util.List;
 
+import org.apache.hc.core5.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,8 +44,11 @@ public class PostController {
         
     }
     @GetMapping("/load")
-    public ResponseEntity<List<PostFeedResponse>> Load() {
-      List<PostFeedResponse> Post =this.PostService.getPostFeed();
+    public ResponseEntity<List<PostFeedResponse>> Load(@AuthenticationPrincipal UserPrincipal principal) {
+      List<PostFeedResponse> Post =this.PostService.getPostFeed(principal.getUsername());
+      if(Post== null){
+        return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(Post);
+      }
       return ResponseEntity.ok(Post);
        
     }

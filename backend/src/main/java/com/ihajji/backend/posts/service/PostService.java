@@ -19,6 +19,7 @@ import com.ihajji.backend.posts.dto.PostRequestDTO;
 import com.ihajji.backend.posts.entity.MediaEntity;
 import com.ihajji.backend.posts.entity.PostEntity;
 import com.ihajji.backend.posts.repository.PostRepository;
+import com.ihajji.backend.posts.repository.ReactionRepository;
 import com.ihajji.backend.user.entity.UserEntity;
 import com.ihajji.backend.user.repository.UserRepository;
 import com.ihajji.backend.user.utils.FileUploadService;
@@ -29,16 +30,17 @@ public class PostService {
     private final FileUploadService fileUploadService;
     private final UserRepository UserRepository;
     private final PostRepository PostRepo;
+    private final ReactionRepository Reactionrepo;
 
-    public PostService(FileUploadService fileUploadService, UserRepository UserRepository, PostRepository PostRepo) {
+    public PostService(FileUploadService fileUploadService, UserRepository UserRepository, PostRepository PostRepo , ReactionRepository Reactionrepo) {
         this.fileUploadService = fileUploadService;
         this.UserRepository = UserRepository;
         this.PostRepo = PostRepo;
+        this.Reactionrepo = Reactionrepo;
 
     }
    public PostErrorsDto savePost(PostRequestDTO dto, String username) {
-System.out.print("file HHHHHHHHHHHHHHHHAAAAAAAAAAAAAAAAAAAARRRRRRRRRRRRRAAAAAAAAAANNNNNNNNIIIIIIIIIIII");
-System.out.println(dto.mediaFiles().get(0).getOriginalFilename());
+
 
     PostErrorsDto errors = new PostErrorsDto();
 
@@ -94,8 +96,12 @@ System.out.println(dto.mediaFiles().get(0).getOriginalFilename());
     return errors;
 }
    @Transactional(readOnly = true)
-    public List<PostFeedResponse> getPostFeed() {
+    public List<PostFeedResponse> getPostFeed(String username ) {
         List<PostEntity> posts = this.PostRepo.findAllPostsWithUser();
+     Optional<UserEntity> user = this.UserRepository.findByUsername(username);
+        if (!user.isPresent()) {
+            return null ; 
+        }
         
         return posts.stream().map(post -> new PostFeedResponse(
             post.getId(),
@@ -106,8 +112,11 @@ System.out.println(dto.mediaFiles().get(0).getOriginalFilename());
             post.getReactions().size(),
             post.getComments().size(),
             post.getCreatedAt(),
-            // This is where we safely get the media URLs
-            post.getMedias().stream().map(m -> m.getMedia()).toList()
+           
+            post.getMedias().stream().map(m -> m.getMedia()).toList(),
+            this.Reactionrepo.existsByUserIdAndPostId(user.get().getId(), post.getId())
+                
+
         )).toList();
     }
  
