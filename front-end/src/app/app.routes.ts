@@ -5,6 +5,7 @@ import { Posts } from './features/post/post';
 import { authGuard } from './core/guards/auth-guard';
 import { Sidebar } from './core/layout/sidebar/sidebar';
 import { SavePost } from './features/save-post/save-post';
+import { ProfilesComponent } from './features/profiles/profiles';
 
 export const routes: Routes = [
   { path: 'register', component: register },
@@ -16,7 +17,8 @@ export const routes: Routes = [
     children: [
       { path: 'home', component: Posts },
       { path: '', redirectTo: 'home', pathMatch: 'full' } ,
-      {path: 'create', component: SavePost}
+      {path: 'create', component: SavePost},
+      {path : 'profile/:username' , component: ProfilesComponent}
     ]
   } 
 ];

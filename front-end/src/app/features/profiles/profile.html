@@ -1,0 +1,65 @@
+<div class="container py-5" *ngIf="profile">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+
+      <!-- Profile Card -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body text-center">
+
+          <!-- Profile Image -->
+          <img 
+            [src]="profile?.profileImage || 'https://via.placeholder.com/100'" 
+            alt="Profile Image" 
+            class="rounded-circle mb-3" 
+            width="100" height="100">
+
+          <!-- Username -->
+          <h4 class="card-title">{{ profile?.username }}</h4>
+
+          <!-- Followers / Following -->
+          <div class="d-flex justify-content-center gap-4 mb-3">
+            <div>
+              <h6 class="mb-0">{{ profile?.followers }}</h6>
+              <small class="text-muted">Followers</small>
+            </div>
+            <div>
+              <h6 class="mb-0">{{ profile?.following }}</h6>
+              <small class="text-muted">Following</small>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Posts Section -->
+      <h5 class="mb-3">Posts</h5>
+      <div *ngIf="profile.post.length === 0" class="text-muted">
+        No posts yet
+      </div>
+
+      <div *ngFor="let post of profile.post" class="card mb-3 shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title">{{ post.title }}</h6>
+          <p class="card-text">{{ post.content }}</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">By {{ post.username }}</small>
+            <small class="text-muted">{{ post.createdAt | date:'short' }}</small>
+          </div>
+          <div class="mt-2 d-flex gap-3">
+            <span>❤️ {{ post.reactionCount }}</span>
+            <span>💬 {{ post.commentCount }}</span>
+          </div>
+
+          <!-- Post media (if any) -->
+          <div class="mt-2" *ngIf="post.medias?.length">
+            <img *ngFor="let media of post.medias" 
+                 [src]="media" 
+                 class="img-fluid rounded me-2 mb-2" 
+                 style="max-height: 150px;">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

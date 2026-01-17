@@ -55,7 +55,7 @@
         style="width: 42px; height: 42px; object-fit: cover;"
       />
       <a
-        routerLink="/profle"
+        [routerLink]="['/profile', profile()?.username]"
         class="text-decoration-none text-black fw-medium"
       >
         {{ profile()?.username }}

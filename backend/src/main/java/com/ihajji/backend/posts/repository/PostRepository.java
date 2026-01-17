@@ -7,9 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.ihajji.backend.posts.entity.PostEntity;
+import com.ihajji.backend.user.entity.UserEntity;
+
 @Repository
 public interface PostRepository extends JpaRepository<PostEntity, Long> {
     // We fetch the posts and the users in one single query
     @Query("SELECT p FROM PostEntity p LEFT JOIN FETCH p.user ORDER BY p.createdAt DESC")
     List<PostEntity> findAllPostsWithUser();
+    List<PostEntity> findAByUser(UserEntity user);
 }

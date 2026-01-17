@@ -23,8 +23,11 @@ password: passwordValue
 
 
  }
-this.Http.post(url,data).subscribe({
-  next: (_) =>{
+this.Http.post(url,data, {withCredentials: true}).subscribe({
+  next: (res) =>{
+    console.log(res);
+    
+
   this.message.set('Registration successful!');
       this.router.navigate(['/']); // navigate to login component
   },

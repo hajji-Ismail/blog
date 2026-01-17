@@ -5,7 +5,9 @@ import java.util.Optional;
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.ihajji.backend.posts.service.PostService;
 import com.ihajji.backend.profile.dto.FollowerDto;
+import com.ihajji.backend.profile.dto.ProfileDto;
 import com.ihajji.backend.profile.dto.userDto;
 import com.ihajji.backend.profile.entity.ProfileEntity;
 import com.ihajji.backend.profile.repository.ProfileRepository;
@@ -16,10 +18,12 @@ import com.ihajji.backend.user.repository.UserRepository;
 public class ProfileService {
     final ProfileRepository repo;
     final UserRepository userRepo;
+    final PostService postService;
 
-    ProfileService(ProfileRepository repo, UserRepository userRepo) {
+    ProfileService(ProfileRepository repo, UserRepository userRepo, PostService postService) {
         this.repo = repo;
         this.userRepo = userRepo;
+        this.postService = postService;
     }
 
     public FollowerDto Follow(String username, FollowerDto Dto) {
@@ -44,13 +48,25 @@ public class ProfileService {
         return new FollowerDto();
 
     }
-    public userDto loadUserProfile(String username){
+
+    public userDto loadUser(String username) {
         Optional<UserEntity> user = this.userRepo.findByUsername(username);
-        if (!user.isPresent()){
+        if (!user.isPresent()) {
             return new userDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "the midleware isn't working");
         }
         return new userDto(user.get().getUsername(), user.get().getProfileImageUrl());
 
     }
- 
+
+    public ProfileDto loadProfile(String username) {
+        Optional<UserEntity> user = this.userRepo.findByUsername(username);
+        if (!user.isPresent()) {
+            return null;
+
+        }
+        
+
+        return new ProfileDto(username ,user.get().getProfileImageUrl(), this.repo.countByFollower(user.get()) , this.repo.countByFollowed(user.get()), this.postService.getPostbyUsername(username));
+    }
+
 }

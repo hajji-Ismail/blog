@@ -12,5 +12,10 @@ Boolean existsByFollowerAndFollowed(UserEntity follower, UserEntity followed);
     
     // Delete a specific follow relationship
     void deleteByFollowerAndFollowed(UserEntity follower, UserEntity followed);
+     // Count how many users a specific user is following
+    Long countByFollower(UserEntity follower);
+
+    // Count how many followers a specific user has
+    Long countByFollowed(UserEntity followed);
     
 } 

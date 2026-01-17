@@ -152,6 +152,28 @@ public class PostService {
 
         return new ErrorDto();
     }
+    public List<PostFeedResponse> getPostbyUsername(String username ){
+        Optional<UserEntity> user = this.UserRepository.findByUsername(username);
+        if (!user.isPresent()) {
+            return null ; 
+        }
+        List<PostEntity> posts = this.PostRepo.findAByUser(user.get());
+ return posts.stream().map(post -> new PostFeedResponse(
+            post.getId(),
+            post.getTitle(),
+            post.getContent(),
+            post.getUser() != null ? post.getUser().getUsername() : "Anonymous",
+            post.getUser() != null ? post.getUser().getProfileImageUrl() : null,
+            post.getReactions().size(),
+            post.getComments().size(),
+            post.getCreatedAt(),
+           
+            post.getMedias().stream().map(m -> m.getMedia()).toList(),
+            this.Reactionrepo.existsByUserIdAndPostId(user.get().getId(), post.getId())
+                
+
+        )).toList();
+    }
 
     
 }

@@ -85,8 +85,7 @@ public ResponseEntity<AuthResponse> register(@Valid @ModelAttribute CreateUserDt
                     .sameSite("Lax")
                     .build();
 
-            return ResponseEntity
-                    .status(HttpStatus.SC_OK)
+            return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                     .body(AuthResponse);
 

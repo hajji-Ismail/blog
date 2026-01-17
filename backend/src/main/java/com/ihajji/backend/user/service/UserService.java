@@ -135,7 +135,7 @@ public class UserService {
         }
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", "USER");
+        claims.put("role", user.getRole());
         claims.put("is_banned",user.getIs_baned());
 
         String accessToken = jwtUtil.generateToken(
