@@ -1,0 +1,45 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+
+      <!-- Search Input -->
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search users..."
+        [(ngModel)]="query"
+        (input)="onSearchChange()"
+      />
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-muted mt-2">
+        Searching...
+      </div>
+
+      <!-- Results -->
+      <ul class="list-group mt-2" *ngIf="results.length">
+        <li
+          class="list-group-item d-flex align-items-center"
+          *ngFor="let user of results"
+        >
+          <img
+            [src]="user.profileImage || 'https://via.placeholder.com/40'"
+            class="rounded-circle me-2"
+            width="40"
+            height="40"
+          />
+          <span>{{ user.username }}</span>
+        </li>
+      </ul>
+
+      <!-- No results -->
+      <div
+        *ngIf="!loading && query.length >= 2 && results.length === 0"
+        class="text-muted mt-2"
+      >
+        No users found
+      </div>
+
+    </div>
+  </div>
+</div>

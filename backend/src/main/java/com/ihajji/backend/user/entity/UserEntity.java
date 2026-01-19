@@ -5,7 +5,14 @@ import java.util.List;
 
 import com.ihajji.backend.posts.entity.PostEntity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 
 @Entity
@@ -28,7 +35,7 @@ public class UserEntity {
 
     private String role = "user";
 
-    private Boolean is_baned = false;
+    private Boolean baned = false;
 
     private String profileImageUrl;
 
@@ -50,8 +57,8 @@ public class UserEntity {
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
-    public Boolean getIs_baned() { return is_baned; }
-    public void setIs_baned(Boolean is_baned) { this.is_baned = is_baned; }
+    public Boolean getIs_baned() { return baned; }
+    public void setIs_baned(Boolean is_baned) { this.baned = is_baned; }
 
     public String getProfileImageUrl() { return profileImageUrl; }
     public void setProfileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; }

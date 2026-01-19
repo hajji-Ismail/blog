@@ -2,6 +2,7 @@ package com.ihajji.backend.user.service;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -11,8 +12,10 @@ import org.springframework.stereotype.Service;
 
 import com.ihajji.backend.user.dto.AuthResponse;
 import com.ihajji.backend.user.dto.CreateUserDto;
+import com.ihajji.backend.user.dto.SearchDto;
 import com.ihajji.backend.user.dto.UserCredentiales;
 import com.ihajji.backend.user.dto.UserErrorsDto;
+import com.ihajji.backend.user.dto.userInterface;
 import com.ihajji.backend.user.entity.UserEntity;
 import com.ihajji.backend.user.repository.UserRepository;
 import com.ihajji.backend.user.utils.FileUploadService;
@@ -41,18 +44,17 @@ public class UserService {
     public AuthResponse register(CreateUserDto dto) {
 
         UserErrorsDto UserERR = new UserErrorsDto(200, "", false, "", "", "");
-        if (dto.getPassword().length() < 8){
+        if (dto.getPassword().length() < 8) {
             UserERR.setPassword("the password should be at least 8 characters wide");
-             UserERR.setCode(HttpStatus.SC_BAD_REQUEST);
+            UserERR.setCode(HttpStatus.SC_BAD_REQUEST);
             UserERR.setHasErr(true);
         }
-        if (dto.getUsername().length() < 3){
+        if (dto.getUsername().length() < 3) {
             UserERR.setUsername("the username should be at least 3 characters wide");
-             UserERR.setCode(HttpStatus.SC_BAD_REQUEST);
+            UserERR.setCode(HttpStatus.SC_BAD_REQUEST);
             UserERR.setHasErr(true);
         }
 
-     
         if (userRepository.existsByEmail(dto.getEmail())) {
             UserERR.setEmail("Email Already taken");
             UserERR.setCode(HttpStatus.SC_BAD_REQUEST);
@@ -102,7 +104,7 @@ public class UserService {
         // 7. Generate JWT Token
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", "USER");
-        claims.put("is_banned",false);
+        claims.put("is_banned", false);
 
         String accessToken = jwtUtil.generateToken(
                 claims,
@@ -136,12 +138,30 @@ public class UserService {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRole());
-        claims.put("is_banned",user.getIs_baned());
+        claims.put("is_banned", user.getIs_baned());
 
         String accessToken = jwtUtil.generateToken(
                 claims,
                 user.getUsername());
 
         return new AuthResponse(UserErr, accessToken);
+    }
+
+    public List<SearchDto> Search(String data) {
+        List<UserEntity> users = this.userRepository.findByUsernameContainingIgnoreCase(data);
+        return users.stream().map(user -> new SearchDto(user.getId(), user.getProfileImageUrl(), user.getUsername()))
+                .toList();
+    }
+
+    public List<userInterface> GetUsers() {
+        return this.userRepository.findAllBy();
+    }
+
+    public Long BannedUsers() {
+        return this.userRepository.countByBanedTrue();
+    }
+
+    public Long UnBannedUsers() {
+        return this.userRepository.countByBanedFalse();
     }
 }

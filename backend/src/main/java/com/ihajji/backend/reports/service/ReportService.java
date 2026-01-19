@@ -1,5 +1,6 @@
 package com.ihajji.backend.reports.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.hc.core5.http.HttpStatus;
@@ -9,7 +10,9 @@ import com.ihajji.backend.posts.entity.PostEntity;
 import com.ihajji.backend.posts.repository.PostRepository;
 import com.ihajji.backend.reports.Entity.ReportPostEntity;
 import com.ihajji.backend.reports.Entity.ReportUserEntity;
+import com.ihajji.backend.reports.dto.PostreportDto;
 import com.ihajji.backend.reports.dto.ReportDto;
+import com.ihajji.backend.reports.dto.UserReportDto;
 import com.ihajji.backend.reports.repository.ReportPostRepository;
 import com.ihajji.backend.reports.repository.ReportUserRepository;
 import com.ihajji.backend.user.entity.UserEntity;
@@ -75,5 +78,14 @@ public class ReportService {
 
         return new ReportDto();
     }
+    public List<PostreportDto> GetPostReports(){
+        return this.reportPost.findAllBy();
+
+    }
+     public List<UserReportDto> GetUserReports(){
+        return this.reportUser.findAllBy();
+
+    }
+
 
 }

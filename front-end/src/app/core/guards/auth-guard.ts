@@ -34,8 +34,10 @@ export const roleGuard: CanActivateFn = (route, state) => {
   const requiredRole = route.data['role'] as string;
 
   // 2. Get JWT from cookie
-  const jwt = getCookie('jwt');
+  const jwt = getCookie('JWT');
   if (!jwt) return router.parseUrl('/login');
+  console.log(jwt, 'fdf');
+  
 
   // 3. Decode JWT
   const payload = decodeJwt(jwt);

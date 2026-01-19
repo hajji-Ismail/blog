@@ -1,14 +1,16 @@
 package com.ihajji.backend.admin.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ihajji.backend.admin.dto.AdminDataDto;
 import com.ihajji.backend.admin.dto.AdminErrorDto;
 import com.ihajji.backend.admin.service.AdminService;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
@@ -32,6 +34,12 @@ public class AdminController {
         
         return ResponseEntity.status(response.getCode()).body(response);
     }
+    @GetMapping("load")
+    public ResponseEntity<AdminDataDto> getMethodName( ) {
+        return ResponseEntity.ok().body(this.service.Load());
+    }
+    
+    
     
     
 }

@@ -1,0 +1,136 @@
+<div class="container-fluid mt-3">
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <!-- ERROR -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- CONTENT -->
+  <div *ngIf="!loading && !error" class="row">
+
+    <!-- LEFT SIDE -->
+    <div class="col-lg-8">
+
+      <!-- SMALL CARDS -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div
+            class="card text-center shadow-sm cursor-pointer"
+            (click)="select('post')"
+            [class.border-primary]="selectedView === 'post'"
+          >
+            <div class="card-body">
+              <h6 class="text-muted">Post Reports</h6>
+              <h3>{{ data.postRerports.length }}</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div
+            class="card text-center shadow-sm cursor-pointer"
+            (click)="select('user')"
+            [class.border-primary]="selectedView === 'user'"
+          >
+            <div class="card-body">
+              <h6 class="text-muted">User Reports</h6>
+              <h3>{{ data.userReports.length }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BIG CARD -->
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <strong>
+            {{ selectedView === 'post' ? 'Post Reports' : 'User Reports' }}
+          </strong>
+        </div>
+
+        <div class="card-body" style="min-height: 250px">
+
+          <!-- POST REPORTS -->
+          <div *ngIf="selectedView === 'post'">
+            <p *ngIf="data.postRerports.length === 0" class="text-muted">
+              No post reports available.
+            </p>
+          </div>
+
+          <!-- USER REPORTS -->
+          <div *ngIf="selectedView === 'user'">
+            <p *ngIf="data.userReports.length === 0" class="text-muted">
+              No user reports available.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="col-lg-4">
+
+      <!-- SEMI CIRCLE -->
+      <div class="card shadow-sm mb-3">
+        <div class="card-body text-center">
+          <h6>Unbanned Users</h6>
+
+          <svg width="200" height="100" viewBox="0 0 200 100">
+            <path
+              d="M10 100 A90 90 0 0 1 190 100"
+              fill="none"
+              stroke="#e9ecef"
+              stroke-width="12"
+            />
+            <path
+              d="M10 100 A90 90 0 0 1 190 100"
+              fill="none"
+              stroke="#0d6efd"
+              stroke-width="12"
+              stroke-dasharray="282"
+              [attr.stroke-dashoffset]="282 - (282 * unbannedPercentage / 100)"
+            />
+          </svg>
+
+          <h4>{{ unbannedPercentage }}%</h4>
+          <small class="text-muted">
+            {{ data.numberOfUnbandUser }} / {{ totalUsers }} users
+          </small>
+        </div>
+      </div>
+
+      <!-- USERS LIST -->
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <strong>Users</strong>
+        </div>
+
+        <div class="card-body p-0" style="height: 250px; overflow-y: auto">
+          <ul class="list-group list-group-flush">
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+              *ngFor="let user of data.users"
+            >
+              <span>{{ user.username }}</span>
+              <span
+                class="badge"
+                [class.bg-success]="!user.baned"
+                [class.bg-danger]="user.baned"
+              >
+                {{ user.baned ? 'Banned' : 'Active' }}
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
