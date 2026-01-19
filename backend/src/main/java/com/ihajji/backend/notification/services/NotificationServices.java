@@ -8,8 +8,11 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.ihajji.backend.notification.dto.NotificationErrDto;
+import com.ihajji.backend.notification.entity.NatureEntity;
 import com.ihajji.backend.notification.entity.NotificationEntity;
 import com.ihajji.backend.notification.repository.NotificationRepository;
+import com.ihajji.backend.profile.dto.FollowingDto;
+import com.ihajji.backend.profile.repository.ProfileRepository;
 import com.ihajji.backend.user.entity.UserEntity;
 import com.ihajji.backend.user.repository.UserRepository;
 
@@ -17,9 +20,11 @@ import com.ihajji.backend.user.repository.UserRepository;
 public class NotificationServices {
     final NotificationRepository repo ;
     final UserRepository userrepo;
-    NotificationServices(NotificationRepository repo , UserRepository userrepo){
+    final  ProfileRepository profilerepo;
+    NotificationServices(NotificationRepository repo , UserRepository userrepo,ProfileRepository profilerepo){
         this.repo = repo;
         this.userrepo = userrepo;
+        this.profilerepo = profilerepo;
     }
     public NotificationErrDto load(String username){
         Optional<UserEntity> user = userrepo.findByUsername(username);
@@ -31,6 +36,19 @@ public class NotificationServices {
             return new NotificationErrDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "midleware is nort working");
         }
         return new NotificationErrDto(notifications.get());
+
+    }
+    public void SavePosts(UserEntity user){
+     List<FollowingDto> followings = this.profilerepo.findAllByFollowing(user);
+     for (FollowingDto  following : followings) {
+        NotificationEntity data = new NotificationEntity();
+        data.setReceiver(following.getFollower());
+        data.setSender(user);
+        data.setReason(String.format("new Post From %S", user.getUsername()));
+        data.setNature(NatureEntity.post);
+        
+     }
+        
 
     }
 }

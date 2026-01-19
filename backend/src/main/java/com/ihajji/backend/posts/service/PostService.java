@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ihajji.backend.notification.services.NotificationServices;
 import com.ihajji.backend.posts.dto.ErrorDto;
 import com.ihajji.backend.posts.dto.PostErrorsDto;
 import com.ihajji.backend.posts.dto.PostFeedResponse;
@@ -31,12 +32,15 @@ public class PostService {
     private final UserRepository UserRepository;
     private final PostRepository PostRepo;
     private final ReactionRepository Reactionrepo;
+    private final NotificationServices notification;
 
-    public PostService(FileUploadService fileUploadService, UserRepository UserRepository, PostRepository PostRepo , ReactionRepository Reactionrepo) {
+    public PostService(FileUploadService fileUploadService, UserRepository UserRepository, PostRepository PostRepo , ReactionRepository Reactionrepo, NotificationServices notification) {
         this.fileUploadService = fileUploadService;
         this.UserRepository = UserRepository;
         this.PostRepo = PostRepo;
         this.Reactionrepo = Reactionrepo;
+        this.notification = notification;
+        
 
     }
    public PostErrorsDto savePost(PostRequestDTO dto, String username) {
@@ -91,7 +95,7 @@ public class PostService {
     post.setMedias(mediaEntities);
 
      PostRepo.save(post);
-   
+this.notification.SavePosts(user)   ;
 
     return errors;
 }

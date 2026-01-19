@@ -36,14 +36,14 @@ public class ProfileService {
         if (!followed.isPresent()) {
             return new FollowerDto(HttpStatus.SC_BAD_REQUEST, "you are following sommeone that it does not exist");
         }
-        if (this.repo.existsByFollowerAndFollowed(follower.get(), followed.get())) {
-            repo.deleteByFollowerAndFollowed(follower.get(), followed.get());
+        if (this.repo.existsByFollowerAndFollowing(follower.get(), followed.get())) {
+            repo.deleteByFollowerAndFollowing(follower.get(), followed.get());
             return new FollowerDto();
         }
 
         ProfileEntity profile = new ProfileEntity();
         profile.setFollower(follower.get());
-        profile.setFollowed(followed.get());
+        profile.setFollowing(followed.get());
         repo.save(profile);
         return new FollowerDto();
 
@@ -66,7 +66,8 @@ public class ProfileService {
         }
         
 
-        return new ProfileDto(username ,user.get().getProfileImageUrl(), this.repo.countByFollower(user.get()) , this.repo.countByFollowed(user.get()), this.postService.getPostbyUsername(username));
+        return new ProfileDto(username ,user.get().getProfileImageUrl(), this.repo.countByFollower(user.get()) , this.repo.countByFollowing(user.get()), this.postService.getPostbyUsername(username));
     }
+
 
 }
