@@ -77,4 +77,19 @@ export class Admin implements OnInit {
       (this.data.numberOfUnbandUser / this.totalUsers) * 100
     );
   }
+  onbanned(username : string){
+    this.http.post('http://localhost:8080/api/v1/admin/baneUser', {
+    username
+    }, {  withCredentials: true,}).subscribe({
+      next(res) {
+        console.log(res);
+        
+      },
+      error(err) {
+        console.log(err);
+        
+      }
+    })
+
+  }
 }

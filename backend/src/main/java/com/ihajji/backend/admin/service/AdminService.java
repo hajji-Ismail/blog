@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.ihajji.backend.admin.dto.AdminDataDto;
 import com.ihajji.backend.admin.dto.AdminErrorDto;
-import com.ihajji.backend.posts.entity.PostEntity;
+import com.ihajji.backend.admin.dto.AdminUserDto;
 import com.ihajji.backend.posts.repository.PostRepository;
 import com.ihajji.backend.reports.service.ReportService;
 import com.ihajji.backend.user.entity.UserEntity;
@@ -26,7 +26,7 @@ public class AdminService {
         this.ReportService = ReportService;
         this.UserService = UserService;
     }
-    public AdminErrorDto BannedUser(AdminErrorDto dto){
+    public AdminErrorDto BannedUser(AdminUserDto dto){
         Optional<UserEntity> user =this.userrepo.findByUsername(dto.getUsername());
         if (!user.isPresent()){
             return new AdminErrorDto(HttpStatus.SC_BAD_REQUEST, "the user can't be found");
@@ -38,17 +38,17 @@ public class AdminService {
 
 
     } 
-       public AdminErrorDto DeletePost(AdminErrorDto dto){
-        Optional<PostEntity> post =this.postrepo.findById(dto.getPost_id());
-        if (!post.isPresent()){
-            return new AdminErrorDto(HttpStatus.SC_BAD_REQUEST, "the user can't be found");
+    //    public AdminErrorDto DeletePost(AdminErrorDto dto){
+    //     Optional<PostEntity> post =this.postrepo.findById(dto.getPost_id());
+    //     if (!post.isPresent()){
+    //         return new AdminErrorDto(HttpStatus.SC_BAD_REQUEST, "the user can't be found");
 
-        }
-        postrepo.delete(post.get());
-        return new AdminErrorDto();
+    //     }
+    //     postrepo.delete(post.get());
+    //     return new AdminErrorDto();
 
 
-    } 
+    // } 
     public AdminDataDto Load(){
         return new AdminDataDto(this.UserService.BannedUsers(), this.UserService.UnBannedUsers(), this.UserService.GetUsers(), this.ReportService.GetPostReports(), this.ReportService.GetUserReports());
 

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ihajji.backend.admin.dto.AdminDataDto;
 import com.ihajji.backend.admin.dto.AdminErrorDto;
+import com.ihajji.backend.admin.dto.AdminUserDto;
 import com.ihajji.backend.admin.service.AdminService;
 
 
@@ -21,19 +22,19 @@ public class AdminController {
         this.service = service;
     }
     @PostMapping("/baneUser")
-    public ResponseEntity<AdminErrorDto> BaneUser(@RequestBody AdminErrorDto entity) {
+    public ResponseEntity<AdminErrorDto> BaneUser(@RequestBody AdminUserDto entity) {
         AdminErrorDto response = service.BannedUser(entity);
 
         
         return ResponseEntity.status(response.getCode()).body(response);
     }
-       @PostMapping("/deletPost")
-    public ResponseEntity<AdminErrorDto> DeletePost(@RequestBody AdminErrorDto entity) {
-        AdminErrorDto response = service.DeletePost(entity);
+    //    @PostMapping("/deletPost")
+    // public ResponseEntity<AdminErrorDto> DeletePost(@RequestBody AdminErrorDto entity) {
+    //     AdminErrorDto response = service.DeletePost(entity);
 
         
-        return ResponseEntity.status(response.getCode()).body(response);
-    }
+    //     return ResponseEntity.status(response.getCode()).body(response);
+    // }
     @GetMapping("load")
     public ResponseEntity<AdminDataDto> getMethodName( ) {
         return ResponseEntity.ok().body(this.service.Load());
