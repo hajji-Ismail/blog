@@ -48,16 +48,17 @@
 
     <!-- Profile Section -->
     <div *ngIf="profile()" class="border-top pt-3 d-flex align-items-center gap-3">
+       <a
+        [routerLink]="['/profile', profile()?.username]"
+        class="text-decoration-none text-black fw-medium"
+      >
       <img
         [src]="getProfileImage(profile()?.profile) || '/assets/default-profile.png'"
         alt="User Profile"
         class="rounded-circle"
         style="width: 42px; height: 42px; object-fit: cover;"
       />
-      <a
-        [routerLink]="['/profile', profile()?.username]"
-        class="text-decoration-none text-black fw-medium"
-      >
+     
         {{ profile()?.username }}
       </a>
     </div>

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.ihajji.backend.posts.service.PostService;
 import com.ihajji.backend.profile.dto.FollowerDto;
+import com.ihajji.backend.profile.dto.FollowerErrorDto;
 import com.ihajji.backend.profile.dto.ProfileDto;
 import com.ihajji.backend.profile.dto.userDto;
 import com.ihajji.backend.profile.entity.ProfileEntity;
@@ -26,26 +27,26 @@ public class ProfileService {
         this.postService = postService;
     }
 
-    public FollowerDto Follow(String username, FollowerDto Dto) {
+    public FollowerErrorDto Follow(String username, FollowerDto Dto) {
         Optional<UserEntity> follower = userRepo.findByUsername(username);
         if (!follower.isPresent()) {
-            return new FollowerDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "midleware is not working properlly");
+            return new FollowerErrorDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "midleware is not working properlly");
         }
 
         Optional<UserEntity> followed = userRepo.findByUsername(Dto.getFollowed());
         if (!followed.isPresent()) {
-            return new FollowerDto(HttpStatus.SC_BAD_REQUEST, "you are following sommeone that it does not exist");
+            return new FollowerErrorDto(HttpStatus.SC_BAD_REQUEST, "you are following sommeone that it does not exist");
         }
         if (this.repo.existsByFollowerAndFollowing(follower.get(), followed.get())) {
             repo.deleteByFollowerAndFollowing(follower.get(), followed.get());
-            return new FollowerDto();
+            return new FollowerErrorDto();
         }
 
         ProfileEntity profile = new ProfileEntity();
         profile.setFollower(follower.get());
         profile.setFollowing(followed.get());
         repo.save(profile);
-        return new FollowerDto();
+        return new FollowerErrorDto();
 
     }
 
@@ -58,15 +59,16 @@ public class ProfileService {
 
     }
 
-    public ProfileDto loadProfile(String username) {
+    public ProfileDto loadProfile(String username, String profile) {
         Optional<UserEntity> user = this.userRepo.findByUsername(username);
         if (!user.isPresent()) {
             return null;
 
         }
+
         
 
-        return new ProfileDto(username ,user.get().getProfileImageUrl(), this.repo.countByFollower(user.get()) , this.repo.countByFollowing(user.get()), this.postService.getPostbyUsername(username));
+        return new ProfileDto(username ,user.get().getProfileImageUrl(), this.repo.countByFollower(user.get()) , this.repo.countByFollowing(user.get()), profile.equals(username),this.postService.getPostbyUsername(username));
     }
 
 

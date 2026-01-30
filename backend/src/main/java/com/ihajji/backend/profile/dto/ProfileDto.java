@@ -9,4 +9,6 @@ public record ProfileDto(
      String profileImage,
         Long followers,
         Long following,
+         Boolean  profile,
+
         List<PostFeedResponse> post) {}

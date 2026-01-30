@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ihajji.backend.profile.dto.FollowerDto;
+import com.ihajji.backend.profile.dto.FollowerErrorDto;
 import com.ihajji.backend.profile.dto.ProfileDto;
 import com.ihajji.backend.profile.dto.userDto;
 import com.ihajji.backend.profile.service.ProfileService;
@@ -32,8 +33,8 @@ public class ProfileController {
         this.userservice = userservice;
     }
 @PostMapping("/follow")
-public ResponseEntity<FollowerDto> follow(@RequestBody FollowerDto dto,@AuthenticationPrincipal UserPrincipal principal){
-FollowerDto response = service.Follow(principal.getUsername(), dto) ;
+public ResponseEntity<FollowerErrorDto> follow(@RequestBody FollowerDto dto,@AuthenticationPrincipal UserPrincipal principal){
+FollowerErrorDto response = service.Follow(principal.getUsername(), dto) ;
     return ResponseEntity.status(response.getCode()).body(response);
 
 }
@@ -43,8 +44,8 @@ public ResponseEntity<userDto> getMethodName(@AuthenticationPrincipal UserPrinci
     return ResponseEntity.status(response.getCode()).body(response);
 }
 @GetMapping("/profile")
-public ResponseEntity<ProfileDto> getMethodName(@RequestParam String param) {
-    ProfileDto data = this.service.loadProfile(param);
+public ResponseEntity<ProfileDto> getMethodName(@RequestParam String param , @AuthenticationPrincipal UserPrincipal principal) {
+    ProfileDto data = this.service.loadProfile(param, principal.getUsername());
     if (data == null){
         return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(null);
     }

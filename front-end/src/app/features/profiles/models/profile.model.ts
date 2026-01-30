@@ -4,6 +4,8 @@ export interface ProfileDto {
   followers: number;
   following: number;
   post: PostFeedResponse[];
+    profile : boolean;
+
 }
 export interface PostFeedResponse {
   id: number;
@@ -13,7 +15,7 @@ export interface PostFeedResponse {
   profileImageUrl: string;
   reactionCount: number;
   commentCount: number;
-  createdAt: string; // ISO date-time string
+  createdAt: string; 
   medias: string[];
   reacted: boolean;
 }

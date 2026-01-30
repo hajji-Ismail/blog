@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { getProfileImage } from '../../services/profile.service';
+import { RouterLink } from "@angular/router";
 
 interface UserSearchResult {
   id: number;
@@ -13,7 +15,7 @@ interface UserSearchResult {
   selector: 'search',
   templateUrl: 'search.html',
   styleUrls: ['search.css'],
-  imports:[CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, RouterLink]
 })
 export class Search {
 
@@ -47,4 +49,7 @@ export class Search {
       }
     });
   }
+     getProfileImage(url: string | null | undefined) {
+          return getProfileImage(url);
+        }
 }

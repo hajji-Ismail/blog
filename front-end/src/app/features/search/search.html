@@ -22,13 +22,20 @@
           class="list-group-item d-flex align-items-center"
           *ngFor="let user of results"
         >
-          <img
-            [src]="user.profileImage || 'https://via.placeholder.com/40'"
+         <a
+        [routerLink]="['/profile', user?.username]"
+        class="text-decoration-none text-black fw-medium"
+      >
+        <img
+            [src]="getProfileImage(user.profileImage)"
             class="rounded-circle me-2"
             width="40"
             height="40"
           />
           <span>{{ user.username }}</span>
+      
+      </a>
+        
         </li>
       </ul>
 

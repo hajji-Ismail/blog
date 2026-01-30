@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProfileDto } from './models/profile.model';
 import { CommonModule, DatePipe } from '@angular/common';
+import { getProfileImage } from '../../services/profile.service';
 
 @Component({
   selector: 'app-profiles',
@@ -39,4 +40,19 @@ export class ProfilesComponent implements OnInit {
       });
     });
   }
-}
+  onfollow(Followed: string){
+    this.http.post('http://localhost:8080/api/v1/user/profile/follow', {Followed}, {withCredentials: true }).subscribe({
+      next(value) {
+        console.log(value);
+      },
+      error(err){
+        console.log(err);
+        
+      }
+    })
+  }
+      getProfileImage(url: string | null | undefined) {
+            return getProfileImage(url);
+          }
+  }
+
