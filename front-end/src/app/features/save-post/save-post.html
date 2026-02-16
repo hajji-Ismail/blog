@@ -2,43 +2,87 @@
   <div class="row justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
       <form [formGroup]="postForm" (ngSubmit)="submitPost()" class="card shadow-sm p-4 mt-4">
-        
         <h4 class="mb-4 text-center fw-bold">
           <i class="bi bi-pencil-square me-2"></i> Create a Post
         </h4>
 
+        <!-- Title -->
         <div class="mb-3">
           <label class="form-label fw-semibold">Title</label>
-          <input type="text" class="form-control" formControlName="title" placeholder="Post title" [class.is-invalid]="titleError()"/>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="title"
+            placeholder="Post title"
+            [class.is-invalid]="titleError()"
+          />
           <div class="text-danger small mt-1" *ngIf="titleError()">{{ titleError() }}</div>
         </div>
 
+        <!-- Content -->
         <div class="mb-3">
           <label class="form-label fw-semibold">Content</label>
-          <textarea class="form-control" rows="4" formControlName="content" placeholder="Write something..." [class.is-invalid]="contentError()"></textarea>
+          <textarea
+            class="form-control"
+            rows="4"
+            formControlName="content"
+            placeholder="Write something..."
+            [class.is-invalid]="contentError()"
+          ></textarea>
           <div class="text-danger small mt-1" *ngIf="contentError()">{{ contentError() }}</div>
         </div>
 
+        <!-- Media Preview -->
         <div class="row g-2 mb-3" *ngIf="selectedMedia.length > 0">
-          <div class="col-4 position-relative" *ngFor="let item of selectedMedia; let i = index">
-            <button type="button" (click)="removeMedia(i)" class="btn-close position-absolute top-0 end-0 bg-white shadow-sm m-1" style="z-index: 10;"></button>
-            
-            <img *ngIf="item.type.includes('image')" [src]="item.preview" class="img-thumbnail w-100 h-100 object-fit-cover" style="aspect-ratio: 1/1;">
-            
-            <video *ngIf="item.type.includes('video')" class="img-thumbnail w-100 h-100 object-fit-cover" style="aspect-ratio: 1/1;">
-               <source [src]="item.preview">
+          <div class="col-4 position-relative" *ngFor="let item of selectedMedia; trackBy: trackByIndex; let i = index">
+            <button
+              type="button"
+              (click)="removeMedia(i)"
+              class="btn-close position-absolute top-0 end-0 bg-white shadow-sm m-1"
+              style="z-index: 10;"
+            ></button>
+
+            <!-- Image Preview -->
+            <img
+              *ngIf="item.type.includes('image')"
+              [src]="item.preview"
+              class="img-thumbnail w-100 h-100 object-fit-cover"
+              style="aspect-ratio: 1/1;"
+            />
+
+            <!-- Video Preview -->
+            <video
+              *ngIf="item.type.includes('video')"
+              class="img-thumbnail w-100 h-100 object-fit-cover"
+              style="aspect-ratio: 1/1;"
+              controls
+            >
+              <source [src]="item.preview" [type]="item.type" />
+              Your browser does not support the video tag.
             </video>
           </div>
         </div>
 
+        <!-- Add Media Button -->
         <div class="mb-4">
-          <label for="media" class="btn btn-outline-dark btn-sm d-flex align-items-center justify-content-center gap-2 p-3 border-dashed">
+          <label
+            for="media"
+            class="btn btn-outline-dark btn-sm d-flex align-items-center justify-content-center gap-2 p-3 border-dashed"
+          >
             <i class="bi bi-cloud-arrow-up-fill fs-5"></i>
             <span>Add photos / videos</span>
           </label>
-          <input type="file" id="media" class="d-none" (change)="onFilesSelected($event)" multiple accept="image/*,video/*" />
+          <input
+            type="file"
+            id="media"
+            class="d-none"
+            (change)="onFilesSelected($event)"
+            multiple
+            accept="image/*,video/*"
+          />
         </div>
 
+        <!-- Submit -->
         <button type="submit" class="btn btn-dark w-100 py-2 fw-bold">
           <i class="bi bi-send-fill me-2"></i> Save Post
         </button>
