@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProfileDto } from './models/profile.model';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -19,13 +19,13 @@ export class ProfilesComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef  // ✅ Inject ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.route.paramMap.pipe(
       switchMap(params => {
-
         // Clear old profile to force re-render
         this.profile = undefined;
 
@@ -40,6 +40,9 @@ export class ProfilesComponent implements OnInit {
     ).subscribe({
       next: (res) => {
         this.profile = res;
+
+        // ✅ Force Angular to update the template immediately
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Failed to fetch profile:', err);
@@ -57,16 +60,12 @@ export class ProfilesComponent implements OnInit {
       { Followed },
       { withCredentials: true }
     ).subscribe({
-      next: () => {
-        console.log('Followed successfully');
-      },
-      error: (err) => {
-        console.error(err);
-      }
+      next: () => console.log('Followed successfully'),
+      error: (err) => console.error(err)
     });
   }
 
   trackByPost(index: number, post: any) {
-    return post.id;
+    return post?.id;
   }
 }
