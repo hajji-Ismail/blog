@@ -15,6 +15,8 @@ import com.ihajji.backend.profile.repository.ProfileRepository;
 import com.ihajji.backend.user.entity.UserEntity;
 import com.ihajji.backend.user.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class ProfileService {
     final ProfileRepository repo;
@@ -27,6 +29,7 @@ public class ProfileService {
         this.postService = postService;
     }
 
+ @Transactional
     public FollowerErrorDto Follow(String username, FollowerDto Dto) {
         Optional<UserEntity> follower = userRepo.findByUsername(username);
         if (!follower.isPresent()) {

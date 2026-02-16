@@ -6,7 +6,7 @@
 
       <!-- PROFILE IMAGE -->
       <img
-        [src]="getProfileImage(p.profileImage )"
+        [src]="getProfileImage(p.profileImage)"
         class="rounded-circle"
         width="80"
         height="80"
@@ -18,8 +18,8 @@
         <h5 class="mb-1">{{ p.username }}</h5>
 
         <div class="d-flex gap-3 text-muted small">
-          <span><strong>{{ p.followers }}</strong> Followers</span>
-          <span><strong>{{ p.following }}</strong> Following</span>
+          <span><strong>{{ p.followers ?? 0 }}</strong> Followers</span>
+          <span><strong>{{ p.following ?? 0 }}</strong> Following</span>
         </div>
       </div>
 
@@ -27,49 +27,54 @@
       <div>
         <button
           *ngIf="!p.profile"
-          onclick="onfollow(p.username)"
-          class="btn btn-sm btn-primary" >
+          (click)="onfollow(p.username)"
+          class="btn btn-sm btn-primary"
+        >
           Follow
         </button>
-
-      
       </div>
 
     </div>
   </div>
 
   <!-- POSTS SECTION -->
-  <div *ngIf="p.post.length === 0" class="text-center text-muted">
+
+  <!-- Safe empty check -->
+  <div *ngIf="(p.post?.length ?? 0) === 0" class="text-center text-muted">
     No posts yet
   </div>
 
-  <div *ngFor="let post of p.post" class="card mb-3 shadow-sm">
+  <!-- Safe ngFor -->
+  <div
+    *ngFor="let post of (p.post ?? []); trackBy: trackByPost"
+    class="card mb-3 shadow-sm"
+  >
     <div class="card-body">
 
       <!-- POST HEADER -->
       <div class="d-flex align-items-center gap-2 mb-2">
         <img
-          [src]="getProfileImage(post.profileImageUrl )"
+          [src]="getProfileImage(post?.profileImageUrl)"
           class="rounded-circle"
           width="32"
           height="32"
         />
         <div>
-          <strong>{{ post.username }}</strong><br />
+          <strong>{{ post?.username }}</strong><br />
           <small class="text-muted">
-            {{ post.createdAt | date:'short' }}
+            {{ post?.createdAt | date:'short' }}
           </small>
         </div>
       </div>
 
       <!-- POST CONTENT -->
-      <h6 class="mb-1">{{ post.title }}</h6>
-      <p class="mb-2">{{ post.content }}</p>
+      <h6 class="mb-1">{{ post?.title }}</h6>
+      <p class="mb-2">{{ post?.content }}</p>
 
       <!-- POST MEDIA -->
-      <div *ngIf="post.medias.length" class="mb-2">
+      <div *ngIf="post?.medias?.length" class="mb-2">
         <img
-          *ngFor="let media of post.medias"
+          *ngFor="let media of (post?.medias ?? [])"
           [src]="media"
           class="img-fluid rounded me-2 mb-2"
           style="max-height: 140px;"
@@ -78,8 +83,8 @@
 
       <!-- POST ACTIONS -->
       <div class="d-flex gap-3 text-muted small">
-        <span>❤️ {{ post.reactionCount }}</span>
-        <span>💬 {{ post.commentCount }}</span>
+        <span>❤️ {{ post?.reactionCount ?? 0 }}</span>
+        <span>💬 {{ post?.commentCount ?? 0 }}</span>
       </div>
 
     </div>

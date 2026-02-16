@@ -101,11 +101,11 @@ this.notification.SavePosts(user)   ;
 }
    @Transactional(readOnly = true)
     public List<PostFeedResponse> getPostFeed(String username ) {
-        List<PostEntity> posts = this.PostRepo.findAllPostsWithUser();
-     Optional<UserEntity> user = this.UserRepository.findByUsername(username);
+        Optional<UserEntity> user = this.UserRepository.findByUsername(username);
         if (!user.isPresent()) {
             return null ; 
         }
+        List<PostEntity> posts = this.PostRepo.findPostsFromFollowedUsers(user.get().getId());
         
         return posts.stream().map(post -> new PostFeedResponse(
             post.getId(),

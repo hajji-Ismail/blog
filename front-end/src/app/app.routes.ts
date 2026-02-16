@@ -20,7 +20,12 @@ export const routes: Routes = [
       { path: 'home', component: Posts },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'create', component: SavePost },
-      { path: 'profile/:username', component: ProfilesComponent },
+      {
+  path: 'profile/:username',
+  component: ProfilesComponent,
+  runGuardsAndResolvers: 'always'
+},
+
       { path: 'search', component: Search },
       {
         path: 'admin', component: Admin, canActivate: [
