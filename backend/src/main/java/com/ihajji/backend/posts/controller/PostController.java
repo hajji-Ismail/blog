@@ -3,7 +3,6 @@ package com.ihajji.backend.posts.controller;
 import java.util.List;
 
 import org.apache.hc.core5.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,6 +57,13 @@ public class PostController {
     
         return ResponseEntity.status(data.getCode()).body(data);
     }
+  @PostMapping("edit")
+  public ResponseEntity< ErrorDto> edit(@RequestBody PostRequestDTO dto ,  @AuthenticationPrincipal UserPrincipal principal) {
+       ErrorDto data = this.PostService.edit(dto, principal.getUsername());
+    
+        return ResponseEntity.status(data.getCode()).body(data);
+  }
+  
     
  
     

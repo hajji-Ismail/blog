@@ -65,3 +65,14 @@ function decodeJwt(token: string): any {
     return null;
   }
 }
+export function getCurrentUsername(): string | null {
+  const jwt = getCookie('JWT');
+  if (!jwt) return null;
+
+  const payload = decodeJwt(jwt);
+  if (!payload) return null;
+
+  // Adjust depending on your backend claim name
+  return payload.sub || payload.username || null;
+}
+

@@ -2,161 +2,97 @@
   <div class="row">
     <div class="col-12 col-md-8 mx-auto">
 
-      <div
-        *ngFor="let post of posts()"
-        class="card mb-4 shadow-sm"
-      >
+      <div *ngFor="let post of posts(); trackBy: trackByPost" class="card mb-4 shadow-sm position-relative">
 
-        <!-- POST HEADER -->
-        <div class="card-body">
+        <!-- BLUR WHEN REPORTING -->
+        <div [class.blur]="reportPostId() === post.id">
 
-          <div class="d-flex justify-content-between align-items-start mb-3">
-
-            <!-- USER INFO -->
+          <!-- POST HEADER -->
+          <div class="d-flex justify-content-between align-items-start mb-3 card-body">
             <div class="d-flex align-items-center">
-              <img
-                [src]="getProfileImage(post.profileImageUrl)"
-                class="rounded-circle me-2"
-                width="40"
-                height="40"
-                alt="profile"
-              />
+              <img [src]="getProfileImage(post.profileImageUrl)" class="rounded-circle me-2" width="40" height="40"/>
               <div>
-                <strong>{{ post.username }}</strong><br />
-                <small class="text-muted">
-                  {{ post.createdAt | date:'medium' }}
-                </small>
+                <strong>{{ post.username }}</strong><br/>
+                <small class="text-muted">{{ post.createdAt | date:'medium' }}</small>
               </div>
             </div>
 
-            <!-- THREE DOTS MENU -->
-            <div class="dropdown">
-              <button
-                class="btn btn-sm btn-link text-muted p-0"
-                type="button"
-                data-bs-toggle="dropdown"
-              >
-                <i class="bi bi-three-dots fs-5"></i>
-              </button>
-
-              <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                <li>
-                  <button
-                    class="dropdown-item d-flex align-items-center gap-2"
-                    (click)="onEdit(post.id)"
-                  >
-                    <i class="bi bi-pencil"></i>
-                    Edit
-                  </button>
-                </li>
-
-                <li>
-                  <button
-                    class="dropdown-item d-flex align-items-center gap-2 text-danger"
-                    (click)="onDelete(post.id)"
-                  >
-                    <i class="bi bi-trash"></i>
-                    Delete
-                  </button>
-                </li>
-
-                <li><hr class="dropdown-divider"></li>
-
-                <li>
-                  <button
-                    class="dropdown-item d-flex align-items-center gap-2"
-                    (click)="onReport(post.id)"
-                  >
-                    <i class="bi bi-flag"></i>
-                    Report
-                  </button>
-                </li>
-              </ul>
-            </div>
-
+            <!-- REPORT BUTTON -->
+            <button class="btn btn-sm btn-link text-danger" (click)="openReport(post.id)">
+              <i class="bi bi-flag"></i>
+            </button>
           </div>
 
-          <h5 class="card-title">{{ post.title }}</h5>
-          <p class="card-text">{{ post.content }}</p>
-        </div>
+          <!-- POST CONTENT -->
+          <h5 class="card-title px-3">{{ post.title }}</h5>
+          <p class="card-text px-3">{{ post.content }}</p>
 
-        <!-- MEDIA -->
-        <div *ngIf="post.medias?.length" class="px-3 pb-2">
-          <img
-            *ngFor="let m of post.medias"
-            [src]="m"
-            class="img-fluid rounded mb-2"
-            alt="media"
-          />
-        </div>
+          <!-- MEDIA -->
+          <div *ngIf="post.medias?.length" class="px-3 pb-2">
+            <img *ngFor="let m of post.medias" [src]="m" class="img-fluid rounded mb-2"/>
+          </div>
 
-        <!-- ACTION BAR -->
-        <div class="card-footer bg-white d-flex align-items-center gap-4">
+          <!-- ACTIONS -->
+          <div class="card-footer bg-white d-flex align-items-center gap-4">
+            <button class="btn btn-link p-0 d-flex align-items-center gap-1" (click)="onReact(post.id)" 
+              [ngStyle]="{ color: post.reacted ? 'red':'black' }">
+              <i class="bi bi-heart-fill fs-5"></i>
+              <span>{{ post.reactionCount }}</span>
+            </button>
 
-          <!-- REACT -->
-          <button
-            class="btn btn-link p-0 d-flex align-items-center gap-1"
-            (click)="onReact(post.id)"
-            [ngStyle]="{ color: post.reacted ? 'red' : 'black' }"
-          >
-            <i class="bi bi-heart-fill fs-5"></i>
-            <span>{{ post.reactionCount }}</span>
-          </button>
+            <button class="btn btn-link p-0 d-flex align-items-center gap-1" (click)="onDisplay(post.id)">
+              <i class="bi bi-chat fs-5"></i>
+              <span>{{ post.commentCount }}</span>
+            </button>
+          </div>
 
-          <!-- COMMENTS -->
-          <button
-            class="btn btn-link p-0 d-flex align-items-center gap-1 text-black"
-            (click)="onDisplay(post.id)"
-          >
-            <i class="bi bi-chat fs-5"></i>
-            <span>{{ post.commentCount }}</span>
-          </button>
-        </div>
+          <!-- COMMENT INPUT -->
+          <div class="d-flex gap-2 p-3">
+            <input type="text" #comment class="form-control" placeholder="Write a comment..."/>
+            <button class="btn btn-link p-0 text-black" (click)="onComment(post.id, comment); comment.value=''">
+              <i class="bi bi-send-fill fs-5"></i>
+            </button>
+          </div>
 
-        <!-- COMMENT INPUT -->
-        <div class="d-flex gap-2 p-3">
-          <input
-            type="text"
-            #comment
-            class="form-control"
-            placeholder="Write a comment..."
-          />
-          <button
-            class="btn btn-link p-0 text-black"
-            (click)="onComment(post.id, comment); comment.value=''"
-          >
-            <i class="bi bi-send-fill fs-5"></i>
-          </button>
-        </div>
-
-        <!-- COMMENTS LIST -->
-        <div *ngIf="post.display" class="px-3 pb-3 border-top">
-          <div
-            *ngFor="let comment of post.comments"
-            class="mb-3"
-          >
-            <div class="d-flex gap-2">
-              <img
-                [src]="getProfileImage(comment.profileImageUrl)"
-                class="rounded-circle"
-                width="32"
-                height="32"
-              />
+          <!-- COMMENTS LIST -->
+          <div *ngIf="post.display" class="px-3 pb-3 border-top">
+            <div *ngFor="let comment of post.comments" class="mb-3 d-flex gap-2">
+              <img [src]="getProfileImage(comment.profileImageUrl)" class="rounded-circle" width="32" height="32"/>
               <div class="flex-grow-1">
                 <div class="d-flex justify-content-between">
                   <strong>{{ comment.username || 'Anonymous' }}</strong>
-                  <small class="text-muted">
-                    {{ comment.createdAt | date:'short' }}
-                  </small>
+                  <small class="text-muted">{{ comment.createdAt | date:'short' }}</small>
                 </div>
-                <p class="mb-0">{{ comment.content }}</p>
+                <p>{{ comment.content }}</p>
               </div>
             </div>
+          </div>
+
+        </div>
+
+        <!-- REPORT POPUP -->
+        <div *ngIf="reportPostId() === post.id" 
+          class="report-popup p-3 rounded shadow position-absolute top-50 start-50 translate-middle bg-white" 
+          style="z-index: 10; width: 90%; max-width: 400px;">
+          <h5>Report Post</h5>
+          <textarea class="form-control mb-2" [(ngModel)]="reportReason" placeholder="Reason"></textarea>
+          <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-secondary btn-sm" (click)="closeReport()">Cancel</button>
+            <button class="btn btn-danger btn-sm" (click)="submitReport()">Report</button>
           </div>
         </div>
 
       </div>
-
     </div>
   </div>
 </div>
+
+<style>
+.blur {
+  filter: blur(3px);
+  pointer-events: none;
+}
+.report-popup {
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+</style>

@@ -12,6 +12,7 @@ import com.ihajji.backend.reports.Entity.ReportPostEntity;
 import com.ihajji.backend.reports.Entity.ReportUserEntity;
 import com.ihajji.backend.reports.dto.PostreportDto;
 import com.ihajji.backend.reports.dto.ReportDto;
+import com.ihajji.backend.reports.dto.ReportErrDto;
 import com.ihajji.backend.reports.dto.UserReportDto;
 import com.ihajji.backend.reports.repository.ReportPostRepository;
 import com.ihajji.backend.reports.repository.ReportUserRepository;
@@ -33,18 +34,18 @@ public class ReportService {
         this.postRepo = postRepo;
     }
 
-    public ReportDto reportPost(String username, ReportDto dto) {
+    public ReportErrDto reportPost(String username, ReportDto dto) {
         if (dto.getReason().isEmpty()) {
-            return new ReportDto(HttpStatus.SC_BAD_REQUEST, "the reson is empty ");
+            return new ReportErrDto(HttpStatus.SC_BAD_REQUEST, "the reson is empty ");
 
         }
         Optional<UserEntity> reporter = userRepo.findByUsername(username);
         if (!reporter.isPresent()) {
-            return new ReportDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "midleware is not working properlly");
+            return new ReportErrDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "midleware is not working properlly");
         }
         Optional<PostEntity> reportedPost = postRepo.findById(dto.getPost_id());
         if (!reportedPost.isPresent()) {
-            return new ReportDto(HttpStatus.SC_BAD_REQUEST, "the post is not exist ");
+            return new ReportErrDto(HttpStatus.SC_BAD_REQUEST, "the post is not exist ");
         }
 
         ReportPostEntity response = new ReportPostEntity();
@@ -53,21 +54,21 @@ public class ReportService {
         response.setReporter(reporter.get());
         reportPost.save(response);
 
-        return new ReportDto();
+        return new ReportErrDto();
     }
 
-    public ReportDto ReportUser(String username, ReportDto dto) {
+    public ReportErrDto ReportUser(String username, ReportDto dto) {
         if (dto.getReason().isEmpty()) {
-            return new ReportDto(HttpStatus.SC_BAD_REQUEST, "the reson is empty ");
+            return new ReportErrDto(HttpStatus.SC_BAD_REQUEST, "the reson is empty ");
 
         }
         Optional<UserEntity> reporter = userRepo.findByUsername(username);
         if (!reporter.isPresent()) {
-            return new ReportDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "midleware is not working properlly");
+            return new ReportErrDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "midleware is not working properlly");
         }
         Optional<UserEntity> reported = userRepo.findByUsername(dto.getUsername());
         if (!reported.isPresent()) {
-            return new ReportDto(HttpStatus.SC_BAD_REQUEST, "the user is not exist ");
+            return new ReportErrDto(HttpStatus.SC_BAD_REQUEST, "the user is not exist ");
         }
 
         ReportUserEntity response = new ReportUserEntity();
@@ -76,7 +77,7 @@ public class ReportService {
         response.setReporter(reporter.get());
         reportUser.save(response);
 
-        return new ReportDto();
+        return new ReportErrDto();
     }
     public List<PostreportDto> GetPostReports(){
         return this.reportPost.findAllBy();

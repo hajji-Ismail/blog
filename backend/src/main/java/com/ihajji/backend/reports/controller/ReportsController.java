@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ihajji.backend.reports.dto.ReportDto;
+import com.ihajji.backend.reports.dto.ReportErrDto;
 import com.ihajji.backend.reports.service.ReportService;
 import com.ihajji.backend.user.config.UserPrincipal;
 
@@ -22,13 +23,13 @@ public class ReportsController {
         
     }
     @PostMapping("/post")
-    public ResponseEntity<ReportDto> ReportPost(@RequestBody ReportDto dto, @AuthenticationPrincipal UserPrincipal principal) {
-        ReportDto response = service.reportPost(principal.getUsername(), dto);
+    public ResponseEntity<ReportErrDto> ReportPost(@RequestBody ReportDto dto, @AuthenticationPrincipal UserPrincipal principal) {
+        ReportErrDto response = service.reportPost(principal.getUsername(), dto);
         return ResponseEntity.status(response.getCode()).body(response);
     }
     @PostMapping("/user")
-    public ResponseEntity<ReportDto> ReportUser(@RequestBody ReportDto dto, @AuthenticationPrincipal UserPrincipal principal) {
-        ReportDto response = service.ReportUser(principal.getUsername(), dto);
+    public ResponseEntity<ReportErrDto> ReportUser(@RequestBody ReportDto dto, @AuthenticationPrincipal UserPrincipal principal) {
+        ReportErrDto response = service.ReportUser(principal.getUsername(), dto);
         return ResponseEntity.status(response.getCode()).body(response);
     }
     

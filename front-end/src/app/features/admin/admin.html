@@ -23,7 +23,7 @@
             [class.border-primary]="selectedView === 'post'">
             <div class="card-body">
               <h6 class="text-muted">Post Reports</h6>
-              <h3>{{ data.postRerports.length }}</h3>
+              <h3>{{ data.postReports?.length || 0 }}</h3>
             </div>
           </div>
         </div>
@@ -33,7 +33,7 @@
             [class.border-primary]="selectedView === 'user'">
             <div class="card-body">
               <h6 class="text-muted">User Reports</h6>
-              <h3>{{ data.userReports.length }}</h3>
+              <h3>{{ data.userReports?.length || 0 }}</h3>
             </div>
           </div>
         </div>
@@ -51,14 +51,14 @@
 
           <!-- POST REPORTS -->
           <div *ngIf="selectedView === 'post'">
-            <p *ngIf="data.postRerports.length === 0" class="text-muted">
+            <p *ngIf="(data.postReports?.length || 0) === 0" class="text-muted">
               No post reports available.
             </p>
           </div>
 
           <!-- USER REPORTS -->
           <div *ngIf="selectedView === 'user'">
-            <p *ngIf="data.userReports.length === 0" class="text-muted">
+            <p *ngIf="(data.userReports?.length || 0) === 0" class="text-muted">
               No user reports available.
             </p>
           </div>
@@ -103,11 +103,10 @@
               <span class="badge" [class.bg-success]="!user.baned" [class.bg-danger]="user.baned">
                 {{ user.baned ? 'Banned' : 'Active' }}
               </span>
-              <button class="btn btn-sm btn-outline-danger" title="Ban user" (click)="onbanned(user.username)"
+              <button class="btn btn-sm btn-outline-danger" title="Ban user" (click)="onBanned(user.username)"
                 [disabled]="user.baned">
                 <i class="bi bi-slash-circle"></i>
               </button>
-
             </li>
           </ul>
         </div>

@@ -1,12 +1,12 @@
 export interface ProfileDto {
-   username:string 
-      profileImage:string
+  username: string;
+  profileImage: string;
   followers: number;
   following: number;
   post: PostFeedResponse[];
-    profile : boolean;
-
+  profile: boolean; // True if this profile belongs to the logged-in user
 }
+
 export interface PostFeedResponse {
   id: number;
   title: string;
@@ -15,7 +15,13 @@ export interface PostFeedResponse {
   profileImageUrl: string;
   reactionCount: number;
   commentCount: number;
-  createdAt: string; 
+  createdAt: string;
   medias: string[];
   reacted: boolean;
+}
+
+export interface ReportDto {
+  Username: string; 
+  reason: string;    
+  post_id: number | null;
 }
