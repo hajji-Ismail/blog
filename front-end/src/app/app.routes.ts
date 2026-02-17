@@ -8,6 +8,7 @@ import { SavePost } from './features/save-post/save-post';
 import { ProfilesComponent } from './features/profiles/profiles';
 import { Search } from './features/search/search';
 import { Admin } from './features/admin/admin';
+import { NotificationComponent } from './features/notification/notification.component';
 
 export const routes: Routes = [
   { path: 'register', component: register },
@@ -20,6 +21,7 @@ export const routes: Routes = [
       { path: 'home', component: Posts },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'create', component: SavePost },
+        { path: 'notification', component: NotificationComponent },
       {
   path: 'profile/:username',
   component: ProfilesComponent,
@@ -31,7 +33,7 @@ export const routes: Routes = [
         path: 'admin', component: Admin, canActivate: [
           authGuard, roleGuard
         ], data: { role: 'ADMIN' }
-      }
+      },
 
     ]
   }

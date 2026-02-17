@@ -26,4 +26,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     long countByBanedFalse();
 
     long countByBanedTrue();
+    List<UserEntity> findByRole(String role);
 }

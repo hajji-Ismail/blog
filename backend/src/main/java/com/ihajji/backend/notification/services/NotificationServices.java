@@ -7,8 +7,8 @@ import java.util.Optional;
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.ihajji.backend.notification.dto.NotificationDto;
 import com.ihajji.backend.notification.dto.NotificationErrDto;
-import com.ihajji.backend.notification.entity.NatureEntity;
 import com.ihajji.backend.notification.entity.NotificationEntity;
 import com.ihajji.backend.notification.repository.NotificationRepository;
 import com.ihajji.backend.profile.dto.FollowingDto;
@@ -21,34 +21,76 @@ public class NotificationServices {
     final NotificationRepository repo ;
     final UserRepository userrepo;
     final  ProfileRepository profilerepo;
-    NotificationServices(NotificationRepository repo , UserRepository userrepo,ProfileRepository profilerepo){
+    public NotificationServices(NotificationRepository repo , UserRepository userrepo,ProfileRepository profilerepo){
         this.repo = repo;
         this.userrepo = userrepo;
         this.profilerepo = profilerepo;
     }
-    public NotificationErrDto load(String username){
-        Optional<UserEntity> user = userrepo.findByUsername(username);
-        if (!user.isPresent()){
-            return new NotificationErrDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "midleware is nort working");
-        }
-        Optional<List<NotificationEntity>> notifications = repo.findByReceiver(user.get());
-          if (!notifications.isPresent()){
-            return new NotificationErrDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "midleware is nort working");
-        }
-        return new NotificationErrDto(notifications.get());
-
+public NotificationErrDto load(String username) {
+    Optional<UserEntity> user = userrepo.findByUsername(username);
+    if (!user.isPresent()) {
+        return new NotificationErrDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Middleware is not working");
     }
+
+    Optional<List<NotificationEntity>> notifications = repo.findByReceiver(user.get());
+    if (!notifications.isPresent() || notifications.get().isEmpty()) {
+        return new NotificationErrDto(HttpStatus.SC_OK, "No notifications found");
+    }
+
+    // Map entities to DTOs
+    List<NotificationDto> dtoList = notifications.get().stream()
+        .map(n -> new NotificationDto(
+            n.getId(),
+            n.getMessage(),
+            n.getNature().toString(),
+            n.getSender().getUsername(),
+            n.getReceiver().getUsername()
+        ))
+        .toList();
+
+    return new NotificationErrDto(dtoList);
+}
+
     public void SavePosts(UserEntity user){
      List<FollowingDto> followings = this.profilerepo.findAllByFollowing(user);
      for (FollowingDto  following : followings) {
         NotificationEntity data = new NotificationEntity();
         data.setReceiver(following.getFollower());
         data.setSender(user);
-        data.setReason(String.format("new Post From %S", user.getUsername()));
-        data.setNature(NatureEntity.post);
+        data.setMessage(String.format("new Post From %S", user.getUsername()));
+        data.setNature("post");
+        this.repo.save(data);
         
      }
         
 
     }
+        public void SaveUserReports(UserEntity user){
+     List<UserEntity> admins = this.userrepo.findByRole("ADMIN");
+     for (UserEntity   admin : admins) {
+        NotificationEntity data = new NotificationEntity();
+        data.setReceiver(admin);
+        data.setSender(user);
+        data.setMessage(String.format("new User has been reported"));
+        data.setNature("report");
+        this.repo.save(data);
+     }
+        
+
+    }
+    public void SavePostReports(UserEntity user){
+     List<UserEntity> admins = this.userrepo.findByRole("ADMIN");
+     for (UserEntity   admin : admins) {
+        NotificationEntity data = new NotificationEntity();
+        data.setReceiver(admin);
+        data.setSender(user);
+        data.setMessage(String.format("new Post has been reported"));
+        data.setNature("report");
+        this.repo.save(data);
+     }
+        
+
+    }
+       
+    
 }

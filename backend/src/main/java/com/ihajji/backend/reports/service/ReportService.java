@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.ihajji.backend.notification.services.NotificationServices;
 import com.ihajji.backend.posts.entity.PostEntity;
 import com.ihajji.backend.posts.repository.PostRepository;
 import com.ihajji.backend.reports.Entity.ReportPostEntity;
@@ -23,13 +24,15 @@ public class ReportService {
     final ReportPostRepository reportPost;
     final UserRepository userRepo;
     final PostRepository postRepo;
+    final NotificationServices notification ;
 
     ReportService(ReportPostRepository reportPost, ReportUserRepository repportUser, UserRepository user,
-            PostRepository postRepo) {
+            PostRepository postRepo,  NotificationServices notification) {
         this.reportPost = reportPost;
         this.reportUser = repportUser;
         this.userRepo = user;
         this.postRepo = postRepo;
+        this.notification = notification;
     }
 
     public ReportErrDto reportPost(String username, ReportDto dto) {
@@ -51,6 +54,7 @@ public class ReportService {
         response.setReason(dto.getReason());
         response.setReporter(reporter.get());
         reportPost.save(response);
+        this.notification.SavePostReports(reporter.get());
 
         return new ReportErrDto();
     }
@@ -74,6 +78,8 @@ public class ReportService {
         response.setReason(dto.getReason());
         response.setReporter(reporter.get());
         reportUser.save(response);
+        this.notification.SaveUserReports(reporter.get());
+
 
         return new ReportErrDto();
     }

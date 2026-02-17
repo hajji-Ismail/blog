@@ -5,26 +5,25 @@ import java.util.List;
 
 import org.apache.hc.core5.http.HttpStatus;
 
-import com.ihajji.backend.notification.entity.NotificationEntity;
 
 public class NotificationErrDto {
     private int code;
     private String message;
-    private List<NotificationEntity> body;
+    private List<NotificationDto> body;
 
     public NotificationErrDto() {
         this.code = HttpStatus.SC_OK;
         this.message = "this app went good";
-        this.body = new ArrayList<NotificationEntity>();
+        this.body = new ArrayList<NotificationDto>();
     }
 
     public NotificationErrDto(int code, String message) {
         this.code = code;
         this.message = message;
-        this.body = new ArrayList<NotificationEntity>();
+        this.body = new ArrayList<NotificationDto>();
 
     }
-      public NotificationErrDto(List<NotificationEntity> body ) {
+      public NotificationErrDto(List<NotificationDto> body ) {
         this.code = HttpStatus.SC_OK;
         this.message = "this app went good";
         this.body = body;
@@ -38,10 +37,10 @@ public class NotificationErrDto {
     public String getMessage() {
         return message;
     }
-    public List<NotificationEntity> getBody() {
+    public List<NotificationDto> getBody() {
         return body;
     }
-    public void setBody(List<NotificationEntity> body) {
+    public void setBody(List<NotificationDto> body) {
         this.body = body;
     }
 

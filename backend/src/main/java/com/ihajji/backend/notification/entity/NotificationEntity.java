@@ -23,21 +23,22 @@ public class NotificationEntity {
      @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name = "receiver", nullable = false) // This creates the foreign key column
     private UserEntity receiver;
-  private  String reason ;
-  private NatureEntity nature;
+  private  String message ;
+  private String nature;
 
     public Long getId() {
         return id;
     }
 
-    public NatureEntity getNature() {
+    public String getNature() {
         return nature;
     }
 
-    public String getReason() {
-        return reason;
+    public String getMessage() {
+        return message;
     }
 
+   
     public UserEntity getReceiver() {
         return receiver;
     }
@@ -50,13 +51,15 @@ public class NotificationEntity {
         this.id = id;
     }
   
-  public void setNature(NatureEntity nature) {
+  public void setNature(String nature) {
       this.nature = nature;
   }
 
-    public void setReason(String reason) {
-        this.reason = reason;
+    public void setMessage(String message) {
+        this.message = message;
     }
+
+    
 
     public void setReceiver(UserEntity receiver) {
         this.receiver = receiver;
