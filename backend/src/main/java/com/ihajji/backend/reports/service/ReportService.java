@@ -10,10 +10,8 @@ import com.ihajji.backend.posts.entity.PostEntity;
 import com.ihajji.backend.posts.repository.PostRepository;
 import com.ihajji.backend.reports.Entity.ReportPostEntity;
 import com.ihajji.backend.reports.Entity.ReportUserEntity;
-import com.ihajji.backend.reports.dto.PostreportDto;
 import com.ihajji.backend.reports.dto.ReportDto;
 import com.ihajji.backend.reports.dto.ReportErrDto;
-import com.ihajji.backend.reports.dto.UserReportDto;
 import com.ihajji.backend.reports.repository.ReportPostRepository;
 import com.ihajji.backend.reports.repository.ReportUserRepository;
 import com.ihajji.backend.user.entity.UserEntity;
@@ -79,12 +77,12 @@ public class ReportService {
 
         return new ReportErrDto();
     }
-    public List<PostreportDto> GetPostReports(){
-        return this.reportPost.findAllBy();
+    public List<ReportPostEntity> GetPostReports(){
+        return this.reportPost.findAll();
 
     }
-     public List<UserReportDto> GetUserReports(){
-        return this.reportUser.findAllBy();
+     public List<ReportUserEntity> GetUserReports(){
+        return this.reportUser.findAll();
 
     }
 

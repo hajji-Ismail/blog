@@ -52,9 +52,7 @@ export class Admin implements OnInit {
       .subscribe({
         next: (value) => {
           // Map backend typo to proper property name if needed
-          if ((value as any).postRerports) {
-            value.postReports = (value as any).postRerports;
-          }
+       
           this.data = value;
           this.loading = false;
           console.log(value, 'admin data');

@@ -36,7 +36,7 @@ public class AdminController {
     //     return ResponseEntity.status(response.getCode()).body(response);
     // }
     @GetMapping("load")
-    public ResponseEntity<AdminDataDto> getMethodName( ) {
+    public ResponseEntity<AdminDataDto> load( ) {
         return ResponseEntity.ok().body(this.service.Load());
     }
     
