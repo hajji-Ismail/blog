@@ -38,7 +38,12 @@ public class PostEntity {
     private String title;
     @Column(nullable = false)
     private String content;
-@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+@OneToMany(
+    mappedBy = "post",
+    cascade = CascadeType.ALL,
+    orphanRemoval = true,
+    fetch = FetchType.LAZY
+)
 private Set<CommentEntity> comments = new HashSet<>();
 
 @OneToMany(

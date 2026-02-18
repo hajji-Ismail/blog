@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class ProfilesComponent implements OnInit {
   profile?: ProfileDto;
+  loading = true;
   userName!: string;
 
   editingPost?: PostFeedResponse;
@@ -39,33 +40,44 @@ export class ProfilesComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit(): void {
+    console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+
     this.route.paramMap.subscribe(params => {
       this.userName = params.get('username')!;
+      this.profile = undefined; // reset to show loading
       this.loadProfile();
     });
   }
 
-  loadProfile() {
-    const params = new HttpParams().set('param', this.userName);
-    this.http.get<ProfileDto>(`${this.BASE_URL}/user/profile/profile`, { params, withCredentials: true })
-      .subscribe({
-        next: (res) => {
-          this.profile = {
-            ...res,
-            post: (res.post ?? []).map(post => ({
-              ...post,
-              medias: post.medias ?? [],
-              display: false,
-              comments: []
-            }))
-          };
-        },
-        error: () => this.showToast('Unable to load profile.', 'error')
-      });
-  }
+
+loadProfile() {
+  this.loading = true; 
+  const params = new HttpParams().set('param', this.userName);
+  
+  this.http.get<ProfileDto>(`${this.BASE_URL}/user/profile/profile`, { params, withCredentials: true })
+    .subscribe({
+      next: (res) => {
+        this.profile = {
+          ...res,
+          post: (res.post ?? []).map(post => ({
+            ...post,
+            medias: post.medias ?? [],
+            display: false,
+            comments: []
+          }))
+        };
+        this.loading = false;
+      },
+      error: () => {
+        this.showToast('Unable to load profile.', 'error');
+        this.loading = false; 
+      }
+    });
+}
+
 
   getProfileImage(url: string | null | undefined) {
     return getProfileImage(url);

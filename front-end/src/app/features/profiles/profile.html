@@ -1,32 +1,38 @@
-<div class="container py-4" *ngIf="profile as p">
+<!-- Profile Container -->
+<div *ngIf="!loading && profile; else loadingTemplate" class="container py-4">
+  <!-- Toast -->
   <div *ngIf="toastMessage" class="profile-toast" [ngClass]="toastType === 'success' ? 'toast-success' : 'toast-error'">
     {{ toastMessage }}
   </div>
 
+  <!-- Profile Header -->
   <div class="card profile-header shadow-sm mb-4">
     <div class="card-body d-flex align-items-center gap-3">
-      <img [src]="getProfileImage(p.profileImage)" class="rounded-circle border" width="80" height="80" />
+      <img [src]="getProfileImage(profile.profileImage)" class="rounded-circle border" width="80" height="80" />
       <div class="flex-grow-1">
-        <h5 class="mb-1">{{ p.username }}</h5>
+        <h5 class="mb-1">{{ profile.username }}</h5>
         <div class="d-flex gap-3 text-muted small">
-          <span><strong>{{ p.followers }}</strong> Followers</span>
-          <span><strong>{{ p.following }}</strong> Following</span>
+          <span><strong>{{ profile.followers }}</strong> Followers</span>
+          <span><strong>{{ profile.following }}</strong> Following</span>
         </div>
       </div>
 
-      <div *ngIf="!p.profile" class="d-flex gap-2">
-        <button class="btn btn-primary btn-sm" (click)="onFollow(p.username)">
-          {{ p.isFollowing ? 'Unfollow' : 'Follow' }}
+      <div *ngIf="!profile.profile" class="d-flex gap-2">
+        <button class="btn btn-primary btn-sm" (click)="onFollow(profile.username)">
+          {{ profile.isFollowing ? 'Unfollow' : 'Follow' }}
         </button>
         <button class="btn btn-outline-danger btn-sm" (click)="openReportUser()">Report User</button>
       </div>
     </div>
   </div>
 
-  <div *ngIf="p.post.length === 0" class="text-center text-muted py-4">No posts yet</div>
+  <!-- No posts message -->
+  <div *ngIf="profile.post.length === 0" class="text-center text-muted py-4">No posts yet</div>
 
-  <div *ngFor="let post of p.post" class="card mb-3 shadow-sm post-card">
+  <!-- Posts -->
+  <div *ngFor="let post of profile.post" class="card mb-3 shadow-sm post-card">
     <div class="card-body">
+      <!-- Post Header -->
       <div class="d-flex align-items-center gap-2 mb-2">
         <img [src]="getProfileImage(post.profileImageUrl)" class="rounded-circle" width="32" height="32" />
         <div>
@@ -42,6 +48,7 @@
         <img *ngFor="let m of post.medias" [src]="m" class="img-fluid rounded" />
       </div>
 
+      <!-- Post Actions -->
       <div class="d-flex align-items-center gap-3 border-top pt-2 post-actions">
         <button class="btn btn-link p-0 d-flex align-items-center gap-1" [class.reacted]="post.reacted" (click)="onReact(post)">
           <i class="bi bi-heart-fill"></i>
@@ -53,11 +60,12 @@
           <span>{{ post.commentCount }}</span>
         </button>
 
-        <span class="ms-auto" *ngIf="!p.profile">
+        <span class="ms-auto" *ngIf="!profile.profile">
           <button class="btn btn-sm btn-outline-danger" (click)="openReportPost(post)">Report Post</button>
         </span>
       </div>
 
+      <!-- Comment Input -->
       <div class="d-flex gap-2 mt-2">
         <input
           type="text"
@@ -69,6 +77,7 @@
         <button class="btn btn-primary btn-sm" (click)="onComment(post)">Send</button>
       </div>
 
+      <!-- Comments -->
       <div *ngIf="post.display" class="comments border-top mt-3 pt-3">
         <div *ngIf="post.comments.length === 0" class="text-muted small">No comments yet.</div>
 
@@ -84,7 +93,8 @@
         </div>
       </div>
 
-      <div class="mt-3 d-flex gap-2" *ngIf="p.profile">
+      <!-- Edit/Delete buttons if it's the user's profile -->
+      <div class="mt-3 d-flex gap-2" *ngIf="profile.profile">
         <button class="btn btn-sm btn-warning" (click)="openEdit(post)">Edit</button>
         <button class="btn btn-sm btn-danger" (click)="openDelete(post)">Delete</button>
       </div>
@@ -92,6 +102,12 @@
   </div>
 </div>
 
+<!-- Loading Template -->
+<ng-template #loadingTemplate>
+  <div class="text-center py-5">Loading profile...</div>
+</ng-template>
+
+<!-- Edit Post Modal -->
 <div *ngIf="editingPost" class="overlay">
   <div class="modal-card">
     <h5 class="mb-3">Edit Post</h5>
@@ -129,6 +145,7 @@
   </div>
 </div>
 
+<!-- Delete Post Modal -->
 <div *ngIf="deletingPost" class="overlay">
   <div class="modal-card">
     <h5>Delete Post</h5>
@@ -140,6 +157,7 @@
   </div>
 </div>
 
+<!-- Report Modal -->
 <div *ngIf="reportMode" class="overlay">
   <div class="modal-card">
     <h5 class="mb-2">{{ reportMode === 'post' ? 'Report Post' : 'Report User' }}</h5>
