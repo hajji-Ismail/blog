@@ -26,6 +26,10 @@ export class AuthService {
     return payload?.role === role;
   }
 
+  logout(): void {
+    document.cookie = 'JWT=; Path=/; Max-Age=0; SameSite=Lax';
+  }
+
   /* ---------- existing helpers ---------- */
 
   private getCookie(name: string): string | null {
