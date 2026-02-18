@@ -7,7 +7,7 @@ export interface PostFeedDto {
   profileImageUrl: string;
   reactionCount: number;
   commentCount: number;  
-  medias: { media: string }[]; 
+  medias: string[]; 
   reacted: boolean
   display: boolean 
   comments : CommentDto[]

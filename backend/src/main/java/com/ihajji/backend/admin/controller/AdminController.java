@@ -28,13 +28,17 @@ public class AdminController {
         
         return ResponseEntity.status(response.getCode()).body(response);
     }
-    //    @PostMapping("/deletPost")
-    // public ResponseEntity<AdminErrorDto> DeletePost(@RequestBody AdminErrorDto entity) {
-    //     AdminErrorDto response = service.DeletePost(entity);
+    @PostMapping("/unbaneUser")
+    public ResponseEntity<AdminErrorDto> UnBaneUser(@RequestBody AdminUserDto entity) {
+        AdminErrorDto response = service.UnBannedUser(entity);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
 
-        
-    //     return ResponseEntity.status(response.getCode()).body(response);
-    // }
+    @PostMapping("/deletPost")
+    public ResponseEntity<AdminErrorDto> DeletePost(@RequestBody AdminErrorDto entity) {
+        AdminErrorDto response = service.DeletePost(entity);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
     @GetMapping("load")
     public ResponseEntity<AdminDataDto> load( ) {
         return ResponseEntity.ok().body(this.service.Load());

@@ -10,4 +10,5 @@ import com.ihajji.backend.reports.Entity.ReportPostEntity;
 @Repository
 public interface ReportPostRepository extends JpaRepository<ReportPostEntity, Long> {
      List<ReportPostEntity> findAll();  
+     void deleteByPostId(Long postId);
 }

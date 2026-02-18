@@ -1,14 +1,17 @@
 package com.ihajji.backend.profile.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 public class FollowerDto {
-    private String Followed;
+    @JsonAlias({ "Followed", "followed" })
+    private String followed;
   
  
     public String getFollowed() {
-        return Followed;
+        return followed;
     }
     public void setFollowed(String followed) {
-        Followed = followed;
+        this.followed = followed;
     }
   
     

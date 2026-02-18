@@ -4,11 +4,16 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { PostFeedDto, CommentDto } from './models/Post.models';
 import { getProfileImage } from '../../services/profile.service';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+
+interface CurrentUserDto {
+  username: string;
+}
 
 @Component({
   selector: 'app-posts',
   templateUrl: './post.html',
-  imports: [CommonModule, FormsModule, DatePipe],
+  imports: [CommonModule, FormsModule, DatePipe, RouterModule],
   standalone: true,
 })
 export class Posts implements OnInit {
@@ -19,10 +24,28 @@ export class Posts implements OnInit {
   reportPostId = signal<number | null>(null);
   reportReason = '';
 
+  currentUsername = '';
+  editingCommentId: number | null = null;
+  editCommentContent = '';
+
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
+    this.loadCurrentUser();
     this.loadPosts();
+  }
+
+  loadCurrentUser() {
+    this.http
+      .get<CurrentUserDto>('http://localhost:8080/api/v1/user/profile/user', {
+        withCredentials: true,
+      })
+      .subscribe({
+        next: data => {
+          this.currentUsername = data.username;
+        },
+        error: err => console.error(err),
+      });
   }
 
   loadPosts() {
@@ -69,6 +92,7 @@ export class Posts implements OnInit {
             )
           );
           input.value = '';
+          this.loadComments(postId);
         },
         error: err => console.error(err),
       });
@@ -82,29 +106,65 @@ export class Posts implements OnInit {
         const display = !post.display;
 
         if (display) {
-          this.http
-            .get<CommentDto[]>(
-              'http://localhost:8080/api/v1/user/comment/load',
-              {
-                params: { param: postId.toString() },
-                withCredentials: true,
-              }
-            )
-            .subscribe({
-              next: comments => {
-                this.posts.update(inner =>
-                  inner.map(p =>
-                    p.id === postId ? { ...p, comments } : p
-                  )
-                );
-              },
-              error: err => console.error(err),
-            });
+          this.loadComments(postId);
         }
 
         return { ...post, display };
       })
     );
+  }
+
+  startEditComment(comment: CommentDto) {
+    this.editingCommentId = comment.id;
+    this.editCommentContent = comment.content;
+  }
+
+  cancelEditComment() {
+    this.editingCommentId = null;
+    this.editCommentContent = '';
+  }
+
+  saveEditComment(postId: number) {
+    if (!this.editingCommentId) return;
+    const content = this.editCommentContent.trim();
+    if (!content) return;
+
+    this.http
+      .post(
+        'http://localhost:8080/api/v1/user/comment/edit',
+        { id: this.editingCommentId, content },
+        { withCredentials: true }
+      )
+      .subscribe({
+        next: () => {
+          this.cancelEditComment();
+          this.loadComments(postId);
+        },
+        error: err => console.error(err),
+      });
+  }
+
+  deleteComment(postId: number, commentId: number) {
+    this.http
+      .post(
+        'http://localhost:8080/api/v1/user/comment/delete',
+        commentId,
+        { withCredentials: true }
+      )
+      .subscribe({
+        next: () => {
+          this.posts.update(posts =>
+            posts.map(p =>
+              p.id === postId
+                ? { ...p, commentCount: Math.max(0, p.commentCount - 1) }
+                : p
+            )
+          );
+          this.cancelEditComment();
+          this.loadComments(postId);
+        },
+        error: err => console.error(err),
+      });
   }
 
   // ---------------- REACT ----------------
@@ -157,6 +217,27 @@ export class Posts implements OnInit {
       )
       .subscribe({
         next: () => this.closeReport(),
+        error: err => console.error(err),
+      });
+  }
+
+  private loadComments(postId: number) {
+    this.http
+      .get<CommentDto[]>(
+        'http://localhost:8080/api/v1/user/comment/load',
+        {
+          params: { param: postId.toString() },
+          withCredentials: true,
+        }
+      )
+      .subscribe({
+        next: comments => {
+          this.posts.update(inner =>
+            inner.map(p =>
+              p.id === postId ? { ...p, comments } : p
+            )
+          );
+        },
         error: err => console.error(err),
       });
   }

@@ -138,21 +138,52 @@ this.notification.SavePosts(user)   ;
         return new ErrorDto();
 
     } 
-    public ErrorDto edit(PostRequestDTO dto , String username){
+    public ErrorDto edit(PostRequestDTO dto, String username) {
         Optional<PostEntity> post = this.PostRepo.findById(dto.ID());
-               if (!post.isPresent()){
+        if (!post.isPresent()) {
             return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "the Post does not existe");
         }
-          if (!post.get().getUser().getUsername().equals(username)){
-                        return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "the post can be edited the owner only");
-
+        if (!post.get().getUser().getUsername().equals(username)) {
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "the post can be edited the owner only");
         }
-        PostEntity EditedPost = new PostEntity();
-        EditedPost.setContent(dto.content());
-        EditedPost.setTitle(dto.title());
-        EditedPost.setId(dto.ID());
+        if (dto.title() == null || dto.title().isBlank() || dto.title().length() > 50) {
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "The title cannot be empty or exceed 50 characters.");
+        }
+        if (dto.content() == null || dto.content().isBlank() || dto.content().length() > 100_000) {
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "The content cannot be empty or exceed 100000 characters.");
+        }
 
-        this.PostRepo.save(EditedPost);
+        PostEntity editedPost = post.get();
+        editedPost.setTitle(dto.title());
+        editedPost.setContent(dto.content());
+
+        boolean hasNewMedia = dto.mediaFiles() != null
+                && dto.mediaFiles().stream().anyMatch(file -> file != null && !file.isEmpty());
+
+        if (hasNewMedia) {
+            Set<MediaEntity> mediaEntities = new HashSet<>();
+
+            for (MultipartFile file : dto.mediaFiles()) {
+                if (file == null || file.isEmpty()) {
+                    continue;
+                }
+                try {
+                    String url = fileUploadService.uploadFile(file, "post-media");
+                    MediaEntity media = new MediaEntity();
+                    media.setMedia(url);
+                    media.setPost(editedPost);
+                    mediaEntities.add(media);
+                } catch (IOException e) {
+                    return new ErrorDto(HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                            "Something went wrong. Please try again later.");
+                }
+            }
+
+            editedPost.getMedias().clear();
+            editedPost.getMedias().addAll(mediaEntities);
+        }
+
+        this.PostRepo.save(editedPost);
 
         return new ErrorDto();
     }

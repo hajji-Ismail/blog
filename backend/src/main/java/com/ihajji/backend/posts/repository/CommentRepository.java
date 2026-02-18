@@ -8,5 +8,6 @@ import com.ihajji.backend.posts.entity.CommentEntity;
 
 public interface CommentRepository extends JpaRepository<CommentEntity, Long>{
     List<CommentEntity> findByPostId(Long id);
+    void deleteByPostId(Long id);
     
 }

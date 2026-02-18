@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ihajji.backend.posts.dto.CommentDto;
+import com.ihajji.backend.posts.dto.CommentEditDto;
 import com.ihajji.backend.posts.dto.CommentSaveDto;
 import com.ihajji.backend.posts.dto.ErrorDto;
 import com.ihajji.backend.posts.service.CommentsService;
@@ -39,5 +40,19 @@ public class CommentController {
     public ResponseEntity<List<CommentDto>> load(@RequestParam Long param) {
         List<CommentDto> comments = this.service.load(param);
         return ResponseEntity.ok(comments);
+    }
+
+    @PostMapping("/edit")
+    public ResponseEntity<ErrorDto> editComment(@RequestBody CommentEditDto dto,
+                                                @AuthenticationPrincipal UserPrincipal principal) {
+        ErrorDto data = this.service.edit(principal.getUsername(), dto);
+        return ResponseEntity.status(data.getCode()).body(data);
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<ErrorDto> deleteComment(@RequestBody Long commentId,
+                                                  @AuthenticationPrincipal UserPrincipal principal) {
+        ErrorDto data = this.service.delete(principal.getUsername(), commentId);
+        return ResponseEntity.status(data.getCode()).body(data);
     }
 }

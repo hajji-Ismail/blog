@@ -1,7 +1,9 @@
 <div class="container py-4" *ngIf="profile as p">
+  <div *ngIf="toastMessage" class="profile-toast" [ngClass]="toastType === 'success' ? 'toast-success' : 'toast-error'">
+    {{ toastMessage }}
+  </div>
 
-  <!-- PROFILE HEADER -->
-  <div class="card shadow-sm mb-4">
+  <div class="card profile-header shadow-sm mb-4">
     <div class="card-body d-flex align-items-center gap-3">
       <img [src]="getProfileImage(p.profileImage)" class="rounded-circle border" width="80" height="80" />
       <div class="flex-grow-1">
@@ -11,71 +13,149 @@
           <span><strong>{{ p.following }}</strong> Following</span>
         </div>
       </div>
-      
-      <!-- If NOT my profile, show Follow and Report User -->
+
       <div *ngIf="!p.profile" class="d-flex gap-2">
-        <button class="btn btn-primary btn-sm" (click)="onFollow(p.username)">{{ p.isFollowing ? "Unfollow" : "Follow" }}</button>
-        <button class="btn btn-outline-danger btn-sm" (click)="reportUser()">Report User</button>
+        <button class="btn btn-primary btn-sm" (click)="onFollow(p.username)">
+          {{ p.isFollowing ? 'Unfollow' : 'Follow' }}
+        </button>
+        <button class="btn btn-outline-danger btn-sm" (click)="openReportUser()">Report User</button>
       </div>
     </div>
   </div>
 
-  <!-- POSTS -->
-  <div *ngIf="(p.post?.length ?? 0) === 0" class="text-center text-muted py-4">No posts yet</div>
+  <div *ngIf="p.post.length === 0" class="text-center text-muted py-4">No posts yet</div>
 
-  <div *ngFor="let post of (p.post ?? [])" class="card mb-3 shadow-sm">
+  <div *ngFor="let post of p.post" class="card mb-3 shadow-sm post-card">
     <div class="card-body">
       <div class="d-flex align-items-center gap-2 mb-2">
         <img [src]="getProfileImage(post.profileImageUrl)" class="rounded-circle" width="32" height="32" />
         <div>
-          <strong>{{ post.username }}</strong><br/>
+          <strong>{{ post.username }}</strong><br />
           <small class="text-muted">{{ post.createdAt | date:'short' }}</small>
         </div>
       </div>
 
-      <h6>{{ post.title }}</h6>
-      <p>{{ post.content }}</p>
+      <h6 class="mb-1">{{ post.title }}</h6>
+      <p class="mb-2">{{ post.content }}</p>
 
-      <div *ngIf="post.medias?.length">
-        <img *ngFor="let m of post.medias" [src]="m" class="img-fluid rounded me-2 mb-2" style="max-height:140px"/>
+      <div *ngIf="post.medias.length" class="media-grid mb-3">
+        <img *ngFor="let m of post.medias" [src]="m" class="img-fluid rounded" />
       </div>
 
-      <div class="d-flex gap-3 text-muted small border-top pt-2">
-        <span>❤️ {{ post.reactionCount }}</span>
-        <span>💬 {{ post.commentCount }}</span>
+      <div class="d-flex align-items-center gap-3 border-top pt-2 post-actions">
+        <button class="btn btn-link p-0 d-flex align-items-center gap-1" [class.reacted]="post.reacted" (click)="onReact(post)">
+          <i class="bi bi-heart-fill"></i>
+          <span>{{ post.reactionCount }}</span>
+        </button>
+
+        <button class="btn btn-link p-0 d-flex align-items-center gap-1" (click)="toggleComments(post)">
+          <i class="bi bi-chat-left-text-fill"></i>
+          <span>{{ post.commentCount }}</span>
+        </button>
+
+        <span class="ms-auto" *ngIf="!p.profile">
+          <button class="btn btn-sm btn-outline-danger" (click)="openReportPost(post)">Report Post</button>
+        </span>
       </div>
 
-      <!-- ACTIONS: If p.profile is true, these are MY posts -->
-      <div class="mt-3">
-        <ng-container *ngIf="p.profile; else notMine">
-          <button class="btn btn-sm btn-warning me-2" (click)="openEdit(post)">Edit</button>
-          <button class="btn btn-sm btn-danger" (click)="deletePost(post)">Delete</button>
-        </ng-container>
-        
-        <ng-template #notMine>
-          <button class="btn btn-sm btn-outline-danger" (click)="reportPost(post)">Report Post</button>
-        </ng-template>
+      <div class="d-flex gap-2 mt-2">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Write a comment..."
+          [(ngModel)]="commentDraft[post.id]"
+          (keyup.enter)="onComment(post)"
+        />
+        <button class="btn btn-primary btn-sm" (click)="onComment(post)">Send</button>
+      </div>
+
+      <div *ngIf="post.display" class="comments border-top mt-3 pt-3">
+        <div *ngIf="post.comments.length === 0" class="text-muted small">No comments yet.</div>
+
+        <div *ngFor="let comment of post.comments" class="d-flex gap-2 mb-2">
+          <img [src]="getProfileImage(comment.profileImageUrl)" class="rounded-circle" width="28" height="28" />
+          <div class="comment-bubble">
+            <div class="d-flex align-items-center gap-2">
+              <strong>{{ comment.username || 'Anonymous' }}</strong>
+              <small class="text-muted">{{ comment.createdAt | date:'short' }}</small>
+            </div>
+            <div>{{ comment.content }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3 d-flex gap-2" *ngIf="p.profile">
+        <button class="btn btn-sm btn-warning" (click)="openEdit(post)">Edit</button>
+        <button class="btn btn-sm btn-danger" (click)="openDelete(post)">Delete</button>
       </div>
     </div>
   </div>
-
 </div>
 
-<!-- EDIT MODAL -->
-<div *ngIf="editingPost" class="modal-backdrop d-flex justify-content-center align-items-center" style="position: fixed; inset:0; background: rgba(0,0,0,0.5); z-index:1050;">
-  <div class="card p-4 shadow" style="width: 400px;">
-    <h5>Edit Post</h5>
+<div *ngIf="editingPost" class="overlay">
+  <div class="modal-card">
+    <h5 class="mb-3">Edit Post</h5>
+
+    <label class="small mb-1">Title</label>
+    <input [(ngModel)]="editTitle" class="form-control mb-2" />
+
+    <label class="small mb-1">Content</label>
+    <textarea [(ngModel)]="editContent" class="form-control mb-3" rows="4"></textarea>
+
     <div class="mb-2">
-      <label class="small">Title</label>
-      <input [(ngModel)]="editTitle" class="form-control" />
+      <label class="small d-block">Current images</label>
+      <div class="media-grid mb-2">
+        <img *ngFor="let m of editingPost.medias" [src]="m" class="img-fluid rounded" />
+      </div>
     </div>
-    <div class="mb-3">
-      <label class="small">Content</label>
-      <textarea [(ngModel)]="editContent" class="form-control" rows="4"></textarea>
+
+    <div class="mb-2">
+      <label class="small">Replace images</label>
+      <input type="file" class="form-control" multiple accept="image/*" (change)="onEditFilesChange($event)" />
+      <small class="text-muted">Selecting new images replaces existing ones.</small>
     </div>
+
+    <div *ngIf="editMediaPreview.length" class="mb-3">
+      <label class="small d-block">Preview</label>
+      <div class="media-grid">
+        <img *ngFor="let preview of editMediaPreview" [src]="preview" class="img-fluid rounded" />
+      </div>
+    </div>
+
     <div class="d-flex justify-content-end gap-2">
       <button class="btn btn-secondary btn-sm" (click)="cancelEdit()">Cancel</button>
       <button class="btn btn-primary btn-sm" (click)="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="deletingPost" class="overlay">
+  <div class="modal-card">
+    <h5>Delete Post</h5>
+    <p class="mb-3">Are you sure you want to delete <strong>{{ deletingPost.title }}</strong>?</p>
+    <div class="d-flex justify-content-end gap-2">
+      <button class="btn btn-secondary btn-sm" (click)="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger btn-sm" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="reportMode" class="overlay">
+  <div class="modal-card">
+    <h5 class="mb-2">{{ reportMode === 'post' ? 'Report Post' : 'Report User' }}</h5>
+    <p class="small text-muted mb-2" *ngIf="reportMode === 'post'">Target: {{ reportingPost?.username }}'s post</p>
+    <p class="small text-muted mb-2" *ngIf="reportMode === 'user'">Target: {{ profile?.username }}</p>
+
+    <textarea
+      [(ngModel)]="reportReason"
+      class="form-control mb-3"
+      rows="4"
+      placeholder="Describe the issue"
+    ></textarea>
+
+    <div class="d-flex justify-content-end gap-2">
+      <button class="btn btn-secondary btn-sm" (click)="closeReportModal()">Cancel</button>
+      <button class="btn btn-danger btn-sm" (click)="submitReport()">Submit Report</button>
     </div>
   </div>
 </div>

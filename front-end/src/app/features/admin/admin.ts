@@ -8,12 +8,31 @@ interface User {
   profileImageUrl: string | null;
 }
 
+interface PostReport {
+  id: number;
+  reason: string;
+  time: string;
+  postId: number;
+  postTitle: string;
+  postOwnerUsername: string;
+  reporterUsername: string;
+}
+
+interface UserReport {
+  id: number;
+  reason: string;
+  time: string;
+  reportedUsername: string;
+  reporterUsername: string;
+}
+
 interface AdminResponse {
   numberOfBandUser: number;
   numberOfUnbandUser: number;
   users: User[];
-  postReports: any[];
-  userReports: any[];
+  postReports: PostReport[];
+  userReports: UserReport[];
+  postRerports?: PostReport[];
 }
 
 @Component({
@@ -25,7 +44,9 @@ interface AdminResponse {
 })
 export class Admin implements OnInit {
   loading = true;
-  error: string | null = null;
+  error = '';
+  toastMessage = '';
+  toastType: 'success' | 'error' = 'success';
 
   data: AdminResponse = {
     numberOfBandUser: 0,
@@ -45,22 +66,25 @@ export class Admin implements OnInit {
 
   loadAdminData(): void {
     this.loading = true;
+    this.error = '';
+
     this.http
       .get<AdminResponse>('http://localhost:8080/api/v1/admin/load', {
         withCredentials: true,
       })
       .subscribe({
         next: (value) => {
-          // Map backend typo to proper property name if needed
-       
-          this.data = value;
+          this.data = {
+            ...value,
+            postReports: value.postReports ?? value.postRerports ?? [],
+            userReports: value.userReports ?? [],
+            users: value.users ?? [],
+          };
           this.loading = false;
-          console.log(value, 'admin data');
         },
-        error: (err) => {
+        error: () => {
           this.loading = false;
           this.error = 'Failed to load admin data';
-          console.error(err, 'error admin');
         },
       });
   }
@@ -78,23 +102,50 @@ export class Admin implements OnInit {
     return Math.round((this.data.numberOfUnbandUser / this.totalUsers) * 100);
   }
 
-  onBanned(username: string) {
-    this.http
-      .post(
-        'http://localhost:8080/api/v1/admin/baneUser',
-        { username },
-        { withCredentials: true }
-      )
+  toggleBan(user: User) {
+    const endpoint = user.baned
+      ? 'http://localhost:8080/api/v1/admin/unbaneUser'
+      : 'http://localhost:8080/api/v1/admin/baneUser';
+
+    this.http.post(endpoint, { username: user.username }, { withCredentials: true })
       .subscribe({
-        next: (res) => {
-          console.log(res);
-          // Update local state immediately
-          const user = this.data.users.find((u) => u.username === username);
-          if (user) user.baned = true;
+        next: () => {
+          const wasBanned = user.baned;
+          user.baned = !user.baned;
+
+          if (wasBanned) {
+            this.data.numberOfBandUser = Math.max(0, this.data.numberOfBandUser - 1);
+            this.data.numberOfUnbandUser += 1;
+            this.showToast(`User ${user.username} unbanned.`, 'success');
+          } else {
+            this.data.numberOfBandUser += 1;
+            this.data.numberOfUnbandUser = Math.max(0, this.data.numberOfUnbandUser - 1);
+            this.showToast(`User ${user.username} banned.`, 'success');
+          }
         },
-        error: (err) => {
-          console.error(err);
-        },
+        error: (err) => this.showToast(err?.error?.message || 'Unable to update user status.', 'error')
       });
+  }
+
+  deletePost(postId: number) {
+    this.http.post('http://localhost:8080/api/v1/admin/deletPost', { post_id: postId }, { withCredentials: true })
+      .subscribe({
+        next: () => {
+          this.data.postReports = this.data.postReports.filter(report => report.postId !== postId);
+          this.showToast(`Post #${postId} deleted.`, 'success');
+        },
+        error: (err) => this.showToast(err?.error?.message || 'Unable to delete post.', 'error')
+      });
+  }
+
+  private showToast(message: string, type: 'success' | 'error') {
+    this.toastMessage = message;
+    this.toastType = type;
+
+    setTimeout(() => {
+      if (this.toastMessage === message) {
+        this.toastMessage = '';
+      }
+    }, 3000);
   }
 }

@@ -19,10 +19,22 @@ export interface PostFeedResponse {
   createdAt: string;
   medias: string[];
   reacted: boolean;
+  display: boolean;
+  comments: CommentDto[];
 }
 
 export interface ReportDto {
   Username: string; 
   reason: string;    
   post_id: number | null;
+}
+
+export interface CommentDto {
+  id: number;
+  postId: number;
+  userId: number;
+  content: string;
+  createdAt: string;
+  username?: string;
+  profileImageUrl?: string;
 }

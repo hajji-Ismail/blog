@@ -4,37 +4,32 @@
 
       <div *ngFor="let post of posts(); trackBy: trackByPost" class="card mb-4 shadow-sm position-relative">
 
-        <!-- BLUR WHEN REPORTING -->
         <div [class.blur]="reportPostId() === post.id">
-
-          <!-- POST HEADER -->
           <div class="d-flex justify-content-between align-items-start mb-3 card-body">
             <div class="d-flex align-items-center">
-              <img [src]="getProfileImage(post.profileImageUrl)" class="rounded-circle me-2" width="40" height="40"/>
+              <a [routerLink]="['/profile', post.username]" class="text-decoration-none">
+                <img [src]="getProfileImage(post.profileImageUrl)" class="rounded-circle me-2" width="40" height="40"/>
+              </a>
               <div>
-                <strong>{{ post.username }}</strong><br/>
+                <a [routerLink]="['/profile', post.username]" class="fw-bold text-dark text-decoration-none">{{ post.username }}</a><br/>
                 <small class="text-muted">{{ post.createdAt | date:'medium' }}</small>
               </div>
             </div>
 
-            <!-- REPORT BUTTON -->
             <button class="btn btn-sm btn-link text-danger" (click)="openReport(post.id)">
               <i class="bi bi-flag"></i>
             </button>
           </div>
 
-          <!-- POST CONTENT -->
           <h5 class="card-title px-3">{{ post.title }}</h5>
           <p class="card-text px-3">{{ post.content }}</p>
 
-          <!-- MEDIA -->
-          <div *ngIf="post.medias?.length" class="px-3 pb-2">
+          <div *ngIf="post.medias.length" class="px-3 pb-2">
             <img *ngFor="let m of post.medias" [src]="m" class="img-fluid rounded mb-2"/>
           </div>
 
-          <!-- ACTIONS -->
           <div class="card-footer bg-white d-flex align-items-center gap-4">
-            <button class="btn btn-link p-0 d-flex align-items-center gap-1" (click)="onReact(post.id)" 
+            <button class="btn btn-link p-0 d-flex align-items-center gap-1" (click)="onReact(post.id)"
               [ngStyle]="{ color: post.reacted ? 'red':'black' }">
               <i class="bi bi-heart-fill fs-5"></i>
               <span>{{ post.reactionCount }}</span>
@@ -46,7 +41,6 @@
             </button>
           </div>
 
-          <!-- COMMENT INPUT -->
           <div class="d-flex gap-2 p-3">
             <input type="text" #comment class="form-control" placeholder="Write a comment..."/>
             <button class="btn btn-link p-0 text-black" (click)="onComment(post.id, comment); comment.value=''">
@@ -54,7 +48,6 @@
             </button>
           </div>
 
-          <!-- COMMENTS LIST -->
           <div *ngIf="post.display" class="px-3 pb-3 border-top">
             <div *ngFor="let comment of post.comments" class="mb-3 d-flex gap-2">
               <img [src]="getProfileImage(comment.profileImageUrl)" class="rounded-circle" width="32" height="32"/>
@@ -63,16 +56,30 @@
                   <strong>{{ comment.username || 'Anonymous' }}</strong>
                   <small class="text-muted">{{ comment.createdAt | date:'short' }}</small>
                 </div>
-                <p>{{ comment.content }}</p>
+
+                <div *ngIf="editingCommentId !== comment.id; else editCommentTpl">
+                  <p class="mb-1">{{ comment.content }}</p>
+                  <div *ngIf="comment.username === currentUsername" class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-secondary" (click)="startEditComment(comment)">Edit</button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="deleteComment(post.id, comment.id)">Delete</button>
+                  </div>
+                </div>
+
+                <ng-template #editCommentTpl>
+                  <div class="d-flex gap-2 mt-1">
+                    <input class="form-control form-control-sm" [(ngModel)]="editCommentContent" />
+                    <button class="btn btn-sm btn-primary" (click)="saveEditComment(post.id)">Save</button>
+                    <button class="btn btn-sm btn-secondary" (click)="cancelEditComment()">Cancel</button>
+                  </div>
+                </ng-template>
               </div>
             </div>
           </div>
 
         </div>
 
-        <!-- REPORT POPUP -->
-        <div *ngIf="reportPostId() === post.id" 
-          class="report-popup p-3 rounded shadow position-absolute top-50 start-50 translate-middle bg-white" 
+        <div *ngIf="reportPostId() === post.id"
+          class="report-popup p-3 rounded shadow position-absolute top-50 start-50 translate-middle bg-white"
           style="z-index: 10; width: 90%; max-width: 400px;">
           <h5>Report Post</h5>
           <textarea class="form-control mb-2" [(ngModel)]="reportReason" placeholder="Reason"></textarea>

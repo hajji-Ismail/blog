@@ -8,6 +8,7 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.ihajji.backend.posts.dto.CommentDto;
+import com.ihajji.backend.posts.dto.CommentEditDto;
 import com.ihajji.backend.posts.dto.CommentSaveDto;
 import com.ihajji.backend.posts.dto.ErrorDto;
 import com.ihajji.backend.posts.entity.CommentEntity;
@@ -69,5 +70,50 @@ public class CommentsService {
                 c.getUser().getProfileImageUrl()
             ))
             .collect(Collectors.toList());
+    }
+
+    public ErrorDto edit(String username, CommentEditDto dto) {
+        if (dto.getId() == null) {
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "Comment id is required");
+        }
+        if (dto.getContent() == null || dto.getContent().isBlank()) {
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "Comment content cannot be empty");
+        }
+        if (dto.getContent().length() > 10000) {
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "Comment cannot exceed 10000 characters");
+        }
+
+        Optional<CommentEntity> commentOpt = repo.findById(dto.getId());
+        if (commentOpt.isEmpty()) {
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "Comment not found");
+        }
+
+        CommentEntity comment = commentOpt.get();
+        if (!comment.getUser().getUsername().equals(username)) {
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "Only the owner can edit this comment");
+        }
+
+        comment.setContent(dto.getContent());
+        repo.save(comment);
+        return new ErrorDto();
+    }
+
+    public ErrorDto delete(String username, Long commentId) {
+        if (commentId == null) {
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "Comment id is required");
+        }
+
+        Optional<CommentEntity> commentOpt = repo.findById(commentId);
+        if (commentOpt.isEmpty()) {
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "Comment not found");
+        }
+
+        CommentEntity comment = commentOpt.get();
+        if (!comment.getUser().getUsername().equals(username)) {
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "Only the owner can delete this comment");
+        }
+
+        repo.delete(comment);
+        return new ErrorDto();
     }
 }

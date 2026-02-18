@@ -58,7 +58,7 @@ public class PostController {
         return ResponseEntity.status(data.getCode()).body(data);
     }
   @PostMapping("edit")
-  public ResponseEntity< ErrorDto> edit(@RequestBody PostRequestDTO dto ,  @AuthenticationPrincipal UserPrincipal principal) {
+  public ResponseEntity< ErrorDto> edit(@ModelAttribute PostRequestDTO dto ,  @AuthenticationPrincipal UserPrincipal principal) {
        ErrorDto data = this.PostService.edit(dto, principal.getUsername());
     
         return ResponseEntity.status(data.getCode()).body(data);
