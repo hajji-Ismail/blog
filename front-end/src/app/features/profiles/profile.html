@@ -14,7 +14,7 @@
       
       <!-- If NOT my profile, show Follow and Report User -->
       <div *ngIf="!p.profile" class="d-flex gap-2">
-        <button class="btn btn-primary btn-sm" (click)="onFollow(p.username)">Follow</button>
+        <button class="btn btn-primary btn-sm" (click)="onFollow(p.username)">{{ p.isFollowing ? "Unfollow" : "Follow" }}</button>
         <button class="btn btn-outline-danger btn-sm" (click)="reportUser()">Report User</button>
       </div>
     </div>

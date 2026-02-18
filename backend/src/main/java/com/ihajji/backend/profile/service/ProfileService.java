@@ -71,7 +71,17 @@ public class ProfileService {
 
         
 
-        return new ProfileDto(username ,user.get().getProfileImageUrl(), this.repo.countByFollower(user.get()) , this.repo.countByFollowing(user.get()), profile.equals(username),this.postService.getPostbyUsername(username));
+        Optional<UserEntity> profileUser = this.userRepo.findByUsername(profile);
+        boolean isFollowing = profileUser.isPresent() && this.repo.existsByFollowerAndFollowing(profileUser.get(), user.get());
+
+        return new ProfileDto(
+                username,
+                user.get().getProfileImageUrl(),
+                this.repo.countByFollower(user.get()),
+                this.repo.countByFollowing(user.get()),
+                profile.equals(username),
+                isFollowing,
+                this.postService.getPostbyUsername(username));
     }
 
 

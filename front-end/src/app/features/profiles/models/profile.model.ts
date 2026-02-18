@@ -5,6 +5,7 @@ export interface ProfileDto {
   following: number;
   post: PostFeedResponse[];
   profile: boolean; // True if this profile belongs to the logged-in user
+  isFollowing: boolean; // True if logged-in user follows this profile
 }
 
 export interface PostFeedResponse {
