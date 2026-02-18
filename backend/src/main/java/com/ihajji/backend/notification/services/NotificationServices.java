@@ -44,7 +44,8 @@ public NotificationErrDto load(String username) {
             n.getMessage(),
             n.getNature().toString(),
             n.getSender().getUsername(),
-            n.getReceiver().getUsername()
+            n.getReceiver().getUsername(),
+            Boolean.TRUE.equals(n.getRead())
         ))
         .toList();
 
@@ -64,6 +65,26 @@ public NotificationErrDto load(String username) {
      }
         
 
+    }
+
+    public NotificationErrDto markAsRead(String username, Long notificationId) {
+        Optional<UserEntity> user = userrepo.findByUsername(username);
+        if (!user.isPresent()) {
+            return new NotificationErrDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Middleware is not working");
+        }
+        if (notificationId == null) {
+            return new NotificationErrDto(HttpStatus.SC_BAD_REQUEST, "Notification id is required");
+        }
+
+        Optional<NotificationEntity> notification = repo.findByIdAndReceiver(notificationId, user.get());
+        if (!notification.isPresent()) {
+            return new NotificationErrDto(HttpStatus.SC_BAD_REQUEST, "Notification not found");
+        }
+
+        NotificationEntity entity = notification.get();
+        entity.setRead(true);
+        repo.save(entity);
+        return new NotificationErrDto();
     }
         public void SaveUserReports(UserEntity user){
      List<UserEntity> admins = this.userrepo.findByRole("ADMIN");

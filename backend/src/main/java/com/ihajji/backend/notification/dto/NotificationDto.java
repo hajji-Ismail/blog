@@ -8,13 +8,15 @@ public class NotificationDto {
     private String nature;
     private String senderUsername;
     private String receiverUsername;
+    private Boolean read;
 
-    public NotificationDto(Long id, String message, String nature, String senderUsername, String receiverUsername) {
+    public NotificationDto(Long id, String message, String nature, String senderUsername, String receiverUsername, Boolean read) {
         this.id = id;
         this.message = message;
         this.nature = nature;
         this.senderUsername = senderUsername;
         this.receiverUsername = receiverUsername;
+        this.read = read;
     }
 
     public Long getId() {
@@ -37,6 +39,10 @@ public class NotificationDto {
         return senderUsername;
     }
 
+    public Boolean getRead() {
+        return read;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -55,6 +61,10 @@ public class NotificationDto {
 
     public void setSenderUsername(String senderUsername) {
         this.senderUsername = senderUsername;
+    }
+
+    public void setRead(Boolean read) {
+        this.read = read;
     }
    
 }

@@ -3,6 +3,8 @@ package com.ihajji.backend.notification.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,6 +24,13 @@ public class NotificationControoler {
         NotificationErrDto response = service.load(principal.getUsername()) ;
         return ResponseEntity.status(response.getCode()).body(response);
 
+    }
+
+    @PostMapping("/mark-read")
+    public ResponseEntity<NotificationErrDto> markRead(@AuthenticationPrincipal UserPrincipal principal,
+            @RequestBody Long notificationId) {
+        NotificationErrDto response = service.markAsRead(principal.getUsername(), notificationId);
+        return ResponseEntity.status(response.getCode()).body(response);
     }
 
 }

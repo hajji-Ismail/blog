@@ -2,17 +2,25 @@ package com.ihajji.backend.notification.entity;
 
 import com.ihajji.backend.user.entity.UserEntity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "Notification")
+@Table(
+    name = "Notification",
+    indexes = {
+        @Index(name = "idx_notification_receiver", columnList = "receiver")
+    }
+)
 public class NotificationEntity {
       @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +33,8 @@ public class NotificationEntity {
     private UserEntity receiver;
   private  String message ;
   private String nature;
+  @Column(name = "is_read")
+  private Boolean read = false;
 
     public Long getId() {
         return id;
@@ -47,6 +57,10 @@ public class NotificationEntity {
         return sender;
     }
 
+    public Boolean getRead() {
+        return read;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -67,6 +81,17 @@ public class NotificationEntity {
 
     public void setSender(UserEntity sender) {
         this.sender = sender;
+    }
+
+    public void setRead(Boolean read) {
+        this.read = read;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (read == null) {
+            read = false;
+        }
     }
     
     

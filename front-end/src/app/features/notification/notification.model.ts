@@ -4,4 +4,5 @@ export interface Notification {
   receiverUsername: string;
   message: string;
   nature: 'report' | 'post';
+  read: boolean;
 }
