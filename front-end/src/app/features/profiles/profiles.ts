@@ -1,10 +1,11 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommentDto, PostFeedResponse, ProfileDto } from './models/profile.model';
 import { CommonModule } from '@angular/common';
 import { getProfileImage } from '../../services/profile.service';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-profiles',
@@ -15,7 +16,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class ProfilesComponent implements OnInit {
   profile?: ProfileDto;
-  loading = true;
+  loading = signal<boolean> (true);
   userName!: string;
 
   editingPost?: PostFeedResponse;
@@ -43,7 +44,6 @@ export class ProfilesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
 
     this.route.paramMap.subscribe(params => {
       this.userName = params.get('username')!;
@@ -53,30 +53,33 @@ export class ProfilesComponent implements OnInit {
   }
 
 
-loadProfile() {
-  this.loading = true; 
-  const params = new HttpParams().set('param', this.userName);
-  
-  this.http.get<ProfileDto>(`${this.BASE_URL}/user/profile/profile`, { params, withCredentials: true })
-    .subscribe({
-      next: (res) => {
-        this.profile = {
-          ...res,
-          post: (res.post ?? []).map(post => ({
-            ...post,
-            medias: post.medias ?? [],
-            display: false,
-            comments: []
-          }))
-        };
-        this.loading = false;
-      },
-      error: () => {
-        this.showToast('Unable to load profile.', 'error');
-        this.loading = false; 
-      }
-    });
-}
+  loadProfile() {
+    this.loading.set(true) ;
+    const params = new HttpParams().set('param', this.userName);
+
+    this.http.get<ProfileDto>(`${this.BASE_URL}/user/profile/profile`, { params, withCredentials: true })
+      .pipe(finalize(() => {
+    this.loading.set(false) ;
+      }))
+      .subscribe({
+        next: (res) => {
+          console.log(res);
+          
+                    this.profile = {
+            ...res,
+            post: (res.post ?? []).map(post => ({
+              ...post,
+              medias: post.medias ?? [],
+              display: false,
+              comments: []
+            }))
+          };
+        },
+        error: () => {
+          this.showToast('Unable to load profile.', 'error');
+        }
+      });
+  }
 
 
   getProfileImage(url: string | null | undefined) {
@@ -86,7 +89,17 @@ loadProfile() {
   onFollow(username: string) {
     this.http.post(`${this.BASE_URL}/user/profile/follow`, { followed: username, Followed: username }, { withCredentials: true })
       .subscribe({
-        next: () => this.loadProfile(),
+        next: () => {
+  if (!this.profile) return;
+
+  const currentlyFollowing = this.profile.isFollowing;
+
+  this.profile.isFollowing = !currentlyFollowing;
+  this.profile.following += currentlyFollowing ? -1 : 1;
+},
+          
+        
+        
         error: () => this.showToast('Unable to update follow state.', 'error')
       });
   }

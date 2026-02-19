@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface User {
@@ -43,7 +43,7 @@ interface AdminResponse {
   styleUrls: ['./admin.css'],
 })
 export class Admin implements OnInit {
-  loading = true;
+loading = signal<boolean>(true)
   error = '';
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
@@ -65,7 +65,7 @@ export class Admin implements OnInit {
   }
 
   loadAdminData(): void {
-    this.loading = true;
+    this.loading.set(true)
     this.error = '';
 
     this.http
@@ -80,10 +80,10 @@ export class Admin implements OnInit {
             userReports: value.userReports ?? [],
             users: value.users ?? [],
           };
-          this.loading = false;
+          this.loading.set(false);
         },
         error: () => {
-          this.loading = false;
+          this.loading.set(false);
           this.error = 'Failed to load admin data';
         },
       });

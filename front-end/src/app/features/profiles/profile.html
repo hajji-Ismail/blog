@@ -1,5 +1,5 @@
 <!-- Profile Container -->
-<div *ngIf="!loading && profile; else loadingTemplate" class="container py-4">
+<div *ngIf="!loading() && profile; " class="container py-4">
   <!-- Toast -->
   <div *ngIf="toastMessage" class="profile-toast" [ngClass]="toastType === 'success' ? 'toast-success' : 'toast-error'">
     {{ toastMessage }}
@@ -102,10 +102,6 @@
   </div>
 </div>
 
-<!-- Loading Template -->
-<ng-template #loadingTemplate>
-  <div class="text-center py-5">Loading profile...</div>
-</ng-template>
 
 <!-- Edit Post Modal -->
 <div *ngIf="editingPost" class="overlay">
@@ -159,7 +155,7 @@
 
 <!-- Report Modal -->
 <div *ngIf="reportMode" class="overlay">
-  <div class="modal-card">
+  <div class="modal-card">f) ;
     <h5 class="mb-2">{{ reportMode === 'post' ? 'Report Post' : 'Report User' }}</h5>
     <p class="small text-muted mb-2" *ngIf="reportMode === 'post'">Target: {{ reportingPost?.username }}'s post</p>
     <p class="small text-muted mb-2" *ngIf="reportMode === 'user'">Target: {{ profile?.username }}</p>
