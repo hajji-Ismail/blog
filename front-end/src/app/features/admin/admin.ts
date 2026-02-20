@@ -61,10 +61,13 @@ loading = signal<boolean>(true)
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
+    console.log("hio");
+    
     this.loadAdminData();
   }
 
   loadAdminData(): void {
+
     this.loading.set(true)
     this.error = '';
 
@@ -74,6 +77,8 @@ loading = signal<boolean>(true)
       })
       .subscribe({
         next: (value) => {
+          console.log(value , "ihjpiouhipuhoiuhu");
+          
           this.data = {
             ...value,
             postReports: value.postReports ?? value.postRerports ?? [],

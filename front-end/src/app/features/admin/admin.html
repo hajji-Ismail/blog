@@ -1,3 +1,4 @@
+
 <div class="container-fluid mt-3">
   <div *ngIf="toastMessage" class="admin-toast" [class.toast-success]="toastType === 'success'" [class.toast-error]="toastType === 'error'">
     {{ toastMessage }}
@@ -9,7 +10,7 @@
     {{ error }}
   </div>
 
-  <div *ngIf="!loading && !error" class="row g-3">
+  <div *ngIf="!loading() && !error" class="row g-3">
     <div class="col-lg-8">
       <div class="row g-3 mb-1">
         <div class="col-md-6">
