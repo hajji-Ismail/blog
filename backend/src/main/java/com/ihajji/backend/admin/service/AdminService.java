@@ -16,6 +16,7 @@ import com.ihajji.backend.posts.entity.PostEntity;
 import com.ihajji.backend.posts.repository.CommentRepository;
 import com.ihajji.backend.posts.repository.PostRepository;
 import com.ihajji.backend.reports.repository.ReportPostRepository;
+import com.ihajji.backend.reports.repository.ReportUserRepository;
 import com.ihajji.backend.reports.service.ReportService;
 import com.ihajji.backend.user.entity.UserEntity;
 import com.ihajji.backend.user.repository.UserRepository;
@@ -28,21 +29,25 @@ public class AdminService {
     final CommentRepository commentRepo;
     final ReportPostRepository reportPostRepo;
     final ReportService ReportService;
+  
     final UserService UserService;
+      final ReportUserRepository ReportUser;
     AdminService(
             UserRepository userrepo,
             PostRepository postrepo,
             CommentRepository commentRepo,
             ReportPostRepository reportPostRepo,
             ReportService ReportService,
-            UserService UserService){
+            UserService UserService, ReportUserRepository ReportUser){
         this.postrepo= postrepo;
         this.userrepo = userrepo;
         this.commentRepo = commentRepo;
         this.reportPostRepo = reportPostRepo;
         this.ReportService = ReportService;
         this.UserService = UserService;
+        this.ReportUser = ReportUser;
     }
+    @Transactional
     public AdminErrorDto BannedUser(AdminUserDto dto){
         Optional<UserEntity> user =this.userrepo.findByUsername(dto.getUsername());
         if (!user.isPresent()){
@@ -53,6 +58,7 @@ public class AdminService {
              return new AdminErrorDto(HttpStatus.SC_BAD_REQUEST, "Admin Can't be baned");
         }
         user.get().setIs_baned(true);
+      this.ReportUser.deleteByReported(user.get());
         userrepo.save(user.get());
         return new AdminErrorDto();
 
