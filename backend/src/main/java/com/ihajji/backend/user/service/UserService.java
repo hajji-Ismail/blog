@@ -135,6 +135,11 @@ public class UserService {
             UserErr.setCode(HttpStatus.SC_BAD_REQUEST);
             return new AuthResponse(UserErr);
         }
+        if (user.getIs_baned()) {
+              UserErr.setMessage("You are banned please contact the administration");
+            UserErr.setCode(HttpStatus.SC_UNAUTHORIZED);
+            return new AuthResponse(UserErr);
+        }
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRole());

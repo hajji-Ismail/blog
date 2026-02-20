@@ -58,6 +58,9 @@ public class ProfileService {
         if (!user.isPresent()) {
             return new userDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "the midleware isn't working");
         }
+        if (user.get().getIs_baned()){
+            return new userDto(HttpStatus.SC_UNAUTHORIZED, "you are baned");
+        }
         return new userDto(user.get().getUsername(), user.get().getProfileImageUrl());
 
     }

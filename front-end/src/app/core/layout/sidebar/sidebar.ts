@@ -28,12 +28,15 @@ export class Sidebar {
     ngOnInit(): void {
       this.http.get<ProfilePecture>('http://localhost:8080/api/v1/user/profile/user', { withCredentials: true })
         .subscribe({
-          next: data => {console.log(data, "fdfd");
-          
+          next: data => {
             this.profile.set(data)}
           ,
           error: err => {
             console.error(err);
+            if (err.error.Code == 401){
+               this.auth.logout();
+    this.router.navigate(['/login']);
+            }
             this.profile.set(null);
           }
         });

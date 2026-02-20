@@ -18,7 +18,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 
 import org.springframework.http.MediaType;
