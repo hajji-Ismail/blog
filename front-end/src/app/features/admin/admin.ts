@@ -43,68 +43,66 @@ interface AdminResponse {
   styleUrls: ['./admin.css'],
 })
 export class Admin implements OnInit {
-loading = signal<boolean>(true)
-  error = '';
-  toastMessage = '';
-  toastType: 'success' | 'error' = 'success';
+  // Signals
+  loading = signal(true);
+  error = signal('');
+  toastMessage = signal('');
+  toastType = signal<'success' | 'error'>('success');
 
-  data: AdminResponse = {
+  data = signal<AdminResponse>({
     numberOfBandUser: 0,
     numberOfUnbandUser: 0,
     users: [],
     postReports: [],
     userReports: [],
-  };
+  });
 
-  selectedView: 'post' | 'user' = 'post';
+  selectedView = signal<'post' | 'user'>('post');
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    console.log("hio");
-    
+    console.log('Component initialized');
     this.loadAdminData();
   }
 
   loadAdminData(): void {
-
-    this.loading.set(true)
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
 
     this.http
-      .get<AdminResponse>('http://localhost:8080/api/v1/admin/load', {
-        withCredentials: true,
-      })
+      .get<AdminResponse>('http://localhost:8080/api/v1/admin/load', { withCredentials: true })
       .subscribe({
         next: (value) => {
-          console.log(value , "ihjpiouhipuhoiuhu");
-          
-          this.data = {
+          console.log('Admin data loaded', value);
+
+          this.data.set({
             ...value,
             postReports: value.postReports ?? value.postRerports ?? [],
             userReports: value.userReports ?? [],
             users: value.users ?? [],
-          };
+          });
+
           this.loading.set(false);
         },
         error: () => {
           this.loading.set(false);
-          this.error = 'Failed to load admin data';
+          this.error.set('Failed to load admin data');
         },
       });
   }
 
   select(view: 'post' | 'user'): void {
-    this.selectedView = view;
+    this.selectedView.set(view);
   }
 
   get totalUsers(): number {
-    return this.data.numberOfBandUser + this.data.numberOfUnbandUser;
+    return this.data().numberOfBandUser + this.data().numberOfUnbandUser;
   }
 
   get unbannedPercentage(): number {
-    if (this.totalUsers === 0) return 0;
-    return Math.round((this.data.numberOfUnbandUser / this.totalUsers) * 100);
+    const total = this.totalUsers;
+    return total === 0 ? 0 : Math.round((this.data().numberOfUnbandUser / total) * 100);
   }
 
   toggleBan(user: User) {
@@ -118,17 +116,22 @@ loading = signal<boolean>(true)
           const wasBanned = user.baned;
           user.baned = !user.baned;
 
+          const currentData = { ...this.data() };
+
           if (wasBanned) {
-            this.data.numberOfBandUser = Math.max(0, this.data.numberOfBandUser - 1);
-            this.data.numberOfUnbandUser += 1;
+            currentData.numberOfBandUser = Math.max(0, currentData.numberOfBandUser - 1);
+            currentData.numberOfUnbandUser += 1;
             this.showToast(`User ${user.username} unbanned.`, 'success');
           } else {
-            this.data.numberOfBandUser += 1;
-            this.data.numberOfUnbandUser = Math.max(0, this.data.numberOfUnbandUser - 1);
+            currentData.numberOfBandUser += 1;
+            currentData.numberOfUnbandUser = Math.max(0, currentData.numberOfUnbandUser - 1);
             this.showToast(`User ${user.username} banned.`, 'success');
           }
+
+          // Update the signal
+          this.data.set(currentData);
         },
-        error: (err) => this.showToast(err?.error?.message || 'Unable to update user status.', 'error')
+        error: (err) => this.showToast(err?.error?.message || 'Unable to update user status.', 'error'),
       });
   }
 
@@ -136,20 +139,22 @@ loading = signal<boolean>(true)
     this.http.post('http://localhost:8080/api/v1/admin/deletPost', { post_id: postId }, { withCredentials: true })
       .subscribe({
         next: () => {
-          this.data.postReports = this.data.postReports.filter(report => report.postId !== postId);
+          const currentData = { ...this.data() };
+          currentData.postReports = currentData.postReports.filter(report => report.postId !== postId);
+          this.data.set(currentData);
           this.showToast(`Post #${postId} deleted.`, 'success');
         },
-        error: (err) => this.showToast(err?.error?.message || 'Unable to delete post.', 'error')
+        error: (err) => this.showToast(err?.error?.message || 'Unable to delete post.', 'error'),
       });
   }
 
   private showToast(message: string, type: 'success' | 'error') {
-    this.toastMessage = message;
-    this.toastType = type;
+    this.toastMessage.set(message);
+    this.toastType.set(type);
 
     setTimeout(() => {
-      if (this.toastMessage === message) {
-        this.toastMessage = '';
+      if (this.toastMessage() === message) {
+        this.toastMessage.set('');
       }
     }, 3000);
   }

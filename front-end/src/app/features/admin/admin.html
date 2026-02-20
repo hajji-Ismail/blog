@@ -1,52 +1,57 @@
-
 <div class="container-fluid mt-3">
-  <div *ngIf="toastMessage" class="admin-toast" [class.toast-success]="toastType === 'success'" [class.toast-error]="toastType === 'error'">
-    {{ toastMessage }}
+  <!-- Toast -->
+  <div *ngIf="toastMessage()" 
+       class="admin-toast" 
+       [class.toast-success]="toastType() === 'success'" 
+       [class.toast-error]="toastType() === 'error'">
+    {{ toastMessage() }}
   </div>
 
- 
-
-  <div *ngIf="error" class="alert alert-danger">
-    {{ error }}
+  <!-- Error -->
+  <div *ngIf="error()" class="alert alert-danger">
+    {{ error() }}
   </div>
 
-  <div *ngIf="!loading() && !error" class="row g-3">
+  <!-- Main content -->
+  <div *ngIf="!loading() && !error()" class="row g-3">
+    <!-- Left column: Reports -->
     <div class="col-lg-8">
+      <!-- Report selectors -->
       <div class="row g-3 mb-1">
         <div class="col-md-6">
           <div class="card text-center shadow-sm cursor-pointer report-selector"
-            (click)="select('post')"
-            [class.border-primary]="selectedView === 'post'">
+               (click)="select('post')"
+               [class.border-primary]="selectedView() === 'post'">
             <div class="card-body">
               <h6 class="text-muted mb-1">Post Reports</h6>
-              <h3>{{ data.postReports.length }}</h3>
+              <h3>{{ data().postReports.length }}</h3>
             </div>
           </div>
         </div>
-
         <div class="col-md-6">
           <div class="card text-center shadow-sm cursor-pointer report-selector"
-            (click)="select('user')"
-            [class.border-primary]="selectedView === 'user'">
+               (click)="select('user')"
+               [class.border-primary]="selectedView() === 'user'">
             <div class="card-body">
               <h6 class="text-muted mb-1">User Reports</h6>
-              <h3>{{ data.userReports.length }}</h3>
+              <h3>{{ data().userReports.length }}</h3>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Reports card -->
       <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <strong>{{ selectedView === 'post' ? 'Post Reports' : 'User Reports' }}</strong>
+          <strong>{{ selectedView() === 'post' ? 'Post Reports' : 'User Reports' }}</strong>
           <button class="btn btn-sm btn-outline-secondary" (click)="loadAdminData()">Refresh</button>
         </div>
 
         <div class="card-body" style="max-height: 520px; overflow: auto;">
-          <div *ngIf="selectedView === 'post'">
-            <p *ngIf="data.postReports.length === 0" class="text-muted mb-0">No post reports available.</p>
-
-            <div *ngFor="let report of data.postReports" class="report-item">
+          <!-- Post reports -->
+          <div *ngIf="selectedView() === 'post'">
+            <p *ngIf="data().postReports.length === 0" class="text-muted mb-0">No post reports available.</p>
+            <div *ngFor="let report of data().postReports" class="report-item">
               <div class="d-flex justify-content-between align-items-start gap-2">
                 <div>
                   <div class="fw-semibold">Post #{{ report.postId }} by {{ report.postOwnerUsername }}</div>
@@ -54,16 +59,15 @@
                 </div>
                 <button class="btn btn-sm btn-danger" (click)="deletePost(report.postId)">Delete Post</button>
               </div>
-
               <div class="small mt-2"><strong>Title:</strong> {{ report.postTitle }}</div>
               <div class="small mt-1"><strong>Reason:</strong> {{ report.reason }}</div>
             </div>
           </div>
 
-          <div *ngIf="selectedView === 'user'">
-            <p *ngIf="data.userReports.length === 0" class="text-muted mb-0">No user reports available.</p>
-
-            <div *ngFor="let report of data.userReports" class="report-item">
+          <!-- User reports -->
+          <div *ngIf="selectedView() === 'user'">
+            <p *ngIf="data().userReports.length === 0" class="text-muted mb-0">No user reports available.</p>
+            <div *ngFor="let report of data().userReports" class="report-item">
               <div class="d-flex justify-content-between align-items-start gap-2">
                 <div>
                   <div class="fw-semibold">{{ report.reportedUsername }}</div>
@@ -77,11 +81,12 @@
       </div>
     </div>
 
+    <!-- Right column: Users -->
     <div class="col-lg-4">
+      <!-- Unbanned users gauge -->
       <div class="card shadow-sm mb-3">
         <div class="card-body text-center">
           <h6>Unbanned Users</h6>
-
           <svg width="200" height="100" viewBox="0 0 200 100">
             <path d="M10 100 A90 90 0 0 1 190 100" fill="none" stroke="#e9ecef" stroke-width="12" />
             <path
@@ -93,37 +98,24 @@
               [attr.stroke-dashoffset]="282 - (282 * unbannedPercentage / 100)"
             />
           </svg>
-
           <h4>{{ unbannedPercentage }}%</h4>
-          <small class="text-muted">
-            {{ data.numberOfUnbandUser }} / {{ totalUsers }} users active
-          </small>
+          <small class="text-muted">{{ data().numberOfUnbandUser }} / {{ totalUsers }} users active</small>
         </div>
       </div>
 
+      <!-- Users list -->
       <div class="card shadow-sm">
-        <div class="card-header">
-          <strong>Users</strong>
-        </div>
-
+        <div class="card-header"><strong>Users</strong></div>
         <div class="card-body p-0" style="max-height: 430px; overflow-y: auto">
           <ul class="list-group list-group-flush">
-            <li class="list-group-item d-flex justify-content-between align-items-center gap-2" *ngFor="let user of data.users">
+            <li class="list-group-item d-flex justify-content-between align-items-center gap-2" *ngFor="let user of data().users">
               <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0">
-                <img
-                  *ngIf="user.profileImageUrl"
-                  [src]="user.profileImageUrl"
-                  class="rounded-circle"
-                  width="28"
-                  height="28"
-                />
+                <img *ngIf="user.profileImageUrl" [src]="user.profileImageUrl" class="rounded-circle" width="28" height="28" />
                 <span class="text-truncate">{{ user.username }}</span>
               </div>
-
               <span class="badge" [class.bg-success]="!user.baned" [class.bg-danger]="user.baned">
                 {{ user.baned ? 'Banned' : 'Active' }}
               </span>
-
               <button
                 class="btn btn-sm"
                 [class.btn-outline-danger]="!user.baned"
