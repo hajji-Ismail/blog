@@ -2,6 +2,7 @@ package com.ihajji.backend.notification.dto;
 
 
 
+
 public class NotificationDto {
     private Long id;
     private String message;
@@ -9,14 +10,16 @@ public class NotificationDto {
     private String senderUsername;
     private String receiverUsername;
     private Boolean read;
+    private String senderprofile;
 
-    public NotificationDto(Long id, String message, String nature, String senderUsername, String receiverUsername, Boolean read) {
+    public NotificationDto(Long id, String message, String nature, String senderUsername, String receiverUsername, Boolean read ,String senderprofile) {
         this.id = id;
         this.message = message;
         this.nature = nature;
         this.senderUsername = senderUsername;
         this.receiverUsername = receiverUsername;
         this.read = read;
+        this.senderprofile=senderprofile;
     }
 
     public Long getId() {
@@ -30,6 +33,11 @@ public class NotificationDto {
     public String getNature() {
         return nature;
     }
+
+    public String getSenderprofile() {
+        return senderprofile;
+    }
+    
 
    public String getReceiverUsername() {
        return receiverUsername;
@@ -50,6 +58,11 @@ public class NotificationDto {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    public void setSenderprofile(String senderprofile) {
+        this.senderprofile = senderprofile;
+    }
+    
 
     public void setNature(String nature) {
         this.nature = nature;

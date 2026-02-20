@@ -5,4 +5,5 @@ export interface Notification {
   message: string;
   nature: 'report' | 'post';
   read: boolean;
+  senderprofile : string;
 }

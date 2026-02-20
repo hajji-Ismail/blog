@@ -28,7 +28,7 @@ export class Posts implements OnInit {
   editingCommentId: number | null = null;
   editCommentContent = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
     this.loadCurrentUser();
@@ -232,13 +232,20 @@ export class Posts implements OnInit {
       )
       .subscribe({
         next: comments => {
-          this.posts.update(inner =>
-            inner.map(p =>
-              p.id === postId ? { ...p, comments } : p
-            )
-          );
-        },
+
+        const sorted = [...comments].sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() -
+            new Date(a.createdAt).getTime()
+        );
+
+        this.posts.update(inner =>
+          inner.map(p =>
+            p.id === postId ? { ...p, comments: sorted } : p
+          )
+        );
+      },
         error: err => console.error(err),
       });
-  }
+}
 }

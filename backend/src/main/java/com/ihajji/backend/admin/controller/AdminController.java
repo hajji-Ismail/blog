@@ -35,7 +35,7 @@ public class AdminController {
     }
 
     @PostMapping("/deletPost")
-    public ResponseEntity<AdminErrorDto> DeletePost(@RequestBody AdminErrorDto entity) {
+    public ResponseEntity<AdminErrorDto> DeletePost(@RequestBody Long entity) {
         AdminErrorDto response = service.DeletePost(entity);
         return ResponseEntity.status(response.getCode()).body(response);
     }

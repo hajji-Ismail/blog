@@ -6,5 +6,6 @@ public interface userInterface {
     Boolean getBaned();
 
     String getProfileImageUrl();
+    String getRole();
 
 }

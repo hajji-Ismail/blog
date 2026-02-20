@@ -15,7 +15,7 @@ export class SavePost implements OnInit {
   // Signals for backend validation errors
   titleError = signal<string>('');
   contentError = signal<string>('');
-
+isSaving = signal<boolean>(false);
   postForm!: FormGroup;
 
   // Store selected media files with preview
@@ -25,7 +25,7 @@ export class SavePost implements OnInit {
     private fb: FormBuilder,
     private http: HttpClient,
     private router: Router,
-    private cdr: ChangeDetectorRef  // ✅ ChangeDetectorRef injected
+    private cdr: ChangeDetectorRef 
   ) {}
 
   ngOnInit() {
@@ -64,37 +64,43 @@ export class SavePost implements OnInit {
     this.selectedMedia.splice(index, 1);
   }
 
-  /** Submit post with media */
-  submitPost() {
-    if (this.postForm.invalid) {
-      this.postForm.markAllAsTouched();
-      return;
-    }
+submitPost() {
 
-    const formData = new FormData();
-    formData.append('title', this.postForm.get('title')?.value);
-    formData.append('content', this.postForm.get('content')?.value);
+  if (this.isSaving()) return;
 
-    this.selectedMedia.forEach((item) => {
-      formData.append('mediaFiles', item.file);
-    });
-
-    this.http
-      .post('http://localhost:8080/api/v1/user/post/save', formData, { withCredentials: true })
-      .subscribe({
-        next: () => this.router.navigate(['/']),
-        error: (err) => {
-          if (err.error) {
-            this.titleError.set(err.error.title || '');
-            this.contentError.set(err.error.content || '');
-            // Force template update for error signals
-            this.cdr.detectChanges();
-          }
-        },
-      });
+  if (this.postForm.invalid) {
+    this.postForm.markAllAsTouched();
+    return;
   }
 
-  /** TrackBy for ngFor */
+  this.isSaving.set(true); 
+
+  const formData = new FormData();
+  formData.append('title', this.postForm.get('title')?.value);
+  formData.append('content', this.postForm.get('content')?.value);
+
+  this.selectedMedia.forEach((item) => {
+    formData.append('mediaFiles', item.file);
+  });
+
+  this.http
+    .post('http://localhost:8080/api/v1/user/post/save', formData, { withCredentials: true })
+    .subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        this.isSaving.set(false); 
+
+        if (err.error) {
+          this.titleError.set(err.error.title || '');
+          this.contentError.set(err.error.content || '');
+        }
+      },
+    });
+}
+  
   trackByIndex(index: number, item: any) {
     return index;
   }

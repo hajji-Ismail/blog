@@ -5,32 +5,48 @@
       <h5 class="mb-3">Notifications</h5>
 
       <!-- Loading -->
-      <div *ngIf="loading" class="text-muted mt-2">Loading...</div>
-      <div *ngIf="!loading && error" class="text-danger mt-2">{{ error }}</div>
+      <div *ngIf="loading()" class="text-muted mt-2">
+        Loading...
+      </div>
+
+      <div *ngIf="!loading() && error()" class="text-danger mt-2">
+        {{ error() }}
+      </div>
 
       <!-- Notifications List -->
-      <ul class="list-group mt-2" *ngIf="!loading && notifications.length">
+      <ul class="list-group mt-2"
+          *ngIf="!loading() && notifications().length">
+
         <li
           class="list-group-item d-flex align-items-center justify-content-between gap-2"
-          *ngFor="let n of notifications"
+          *ngFor="let n of notifications()"
           (click)="onNotificationClick(n)"
           style="cursor:pointer"
           [class.bg-light]="!n.read"
         >
           <div class="d-flex align-items-center">
             <img
-              [src]="getProfileImage(n.senderUsername)"
+              [src]="getProfileImage(n.senderprofile)"
               class="rounded-circle me-2"
               width="40"
               height="40"
             />
+
             <div>
               <strong>{{ n.senderUsername }}</strong>: {{ n.message }}
-              <span class="badge bg-secondary ms-2">{{ n.nature }}</span>
-              <span *ngIf="!n.read" class="badge bg-primary ms-2">Unread</span>
+              <span class="badge bg-secondary ms-2">
+                {{ n.nature }}
+              </span>
+
+              <span *ngIf="!n.read"
+                    class="badge bg-primary ms-2">
+                Unread
+              </span>
             </div>
           </div>
-          <button class="btn btn-sm btn-outline-primary"
+
+          <button
+            class="btn btn-sm btn-outline-primary"
             [disabled]="n.read"
             (click)="markAsRead(n, $event)">
             {{ n.read ? 'Read' : 'Mark as read' }}
@@ -39,7 +55,8 @@
       </ul>
 
       <!-- No notifications -->
-      <div *ngIf="!loading && notifications.length === 0" class="text-muted mt-2">
+      <div *ngIf="!loading() && notifications().length === 0"
+           class="text-muted mt-2">
         No notifications
       </div>
 

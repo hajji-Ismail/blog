@@ -49,6 +49,9 @@ public class AdminService {
             return new AdminErrorDto(HttpStatus.SC_BAD_REQUEST, "the user can't be found");
 
         }
+        if (user.get().getRole().equals("ADMIN")){
+             return new AdminErrorDto(HttpStatus.SC_BAD_REQUEST, "Admin Can't be baned");
+        }
         user.get().setIs_baned(true);
         userrepo.save(user.get());
         return new AdminErrorDto();
@@ -66,14 +69,14 @@ public class AdminService {
     }
 
     @Transactional
-    public AdminErrorDto DeletePost(AdminErrorDto dto){
-        Optional<PostEntity> post = this.postrepo.findById(dto.getPost_id());
+    public AdminErrorDto DeletePost(Long dto){
+        Optional<PostEntity> post = this.postrepo.findById(dto);
         if (!post.isPresent()){
             return new AdminErrorDto(HttpStatus.SC_BAD_REQUEST, "the post can't be found");
         }
 
-        this.reportPostRepo.deleteByPostId(dto.getPost_id());
-        this.commentRepo.deleteByPostId(dto.getPost_id());
+        this.reportPostRepo.deleteByPostId(dto);
+        this.commentRepo.deleteByPostId(dto);
         this.postrepo.delete(post.get());
 
         return new AdminErrorDto();

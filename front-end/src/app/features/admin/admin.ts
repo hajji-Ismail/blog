@@ -6,6 +6,7 @@ interface User {
   username: string;
   baned: boolean;
   profileImageUrl: string | null;
+  role: string;
 }
 
 interface PostReport {
@@ -105,38 +106,51 @@ export class Admin implements OnInit {
     return total === 0 ? 0 : Math.round((this.data().numberOfUnbandUser / total) * 100);
   }
 
-  toggleBan(user: User) {
-    const endpoint = user.baned
-      ? 'http://localhost:8080/api/v1/admin/unbaneUser'
-      : 'http://localhost:8080/api/v1/admin/baneUser';
+toggleBan(user: User) {
 
-    this.http.post(endpoint, { username: user.username }, { withCredentials: true })
-      .subscribe({
-        next: () => {
-          const wasBanned = user.baned;
-          user.baned = !user.baned;
-
-          const currentData = { ...this.data() };
-
-          if (wasBanned) {
-            currentData.numberOfBandUser = Math.max(0, currentData.numberOfBandUser - 1);
-            currentData.numberOfUnbandUser += 1;
-            this.showToast(`User ${user.username} unbanned.`, 'success');
-          } else {
-            currentData.numberOfBandUser += 1;
-            currentData.numberOfUnbandUser = Math.max(0, currentData.numberOfUnbandUser - 1);
-            this.showToast(`User ${user.username} banned.`, 'success');
-          }
-
-          // Update the signal
-          this.data.set(currentData);
-        },
-        error: (err) => this.showToast(err?.error?.message || 'Unable to update user status.', 'error'),
-      });
+  if (user.role === 'ADMIN') {
+    this.showToast('Administrators cannot be banned.', 'error');
+    return;
   }
 
+  const endpoint = user.baned
+    ? 'http://localhost:8080/api/v1/admin/unbaneUser'
+    : 'http://localhost:8080/api/v1/admin/baneUser';
+
+  this.http.post(endpoint, { username: user.username }, { withCredentials: true })
+    .subscribe({
+      next: () => {
+        const wasBanned = user.baned;
+
+        const currentData = { ...this.data() };
+
+        const updatedUsers = currentData.users.map(u =>
+          u.username === user.username
+            ? { ...u, baned: !u.baned }
+            : u
+        );
+
+        currentData.users = updatedUsers;
+
+        if (wasBanned) {
+          currentData.numberOfBandUser = Math.max(0, currentData.numberOfBandUser - 1);
+          currentData.numberOfUnbandUser += 1;
+          this.showToast(`User ${user.username} unbanned.`, 'success');
+        } else {
+          currentData.numberOfBandUser += 1;
+          currentData.numberOfUnbandUser = Math.max(0, currentData.numberOfUnbandUser - 1);
+          this.showToast(`User ${user.username} banned.`, 'success');
+        }
+
+        this.data.set(currentData);
+      },
+      error: (err) =>
+        this.showToast(err?.error?.message || 'Unable to update user status.', 'error'),
+    });
+}
+
   deletePost(postId: number) {
-    this.http.post('http://localhost:8080/api/v1/admin/deletPost', { post_id: postId }, { withCredentials: true })
+    this.http.post('http://localhost:8080/api/v1/admin/deletPost', postId , { withCredentials: true })
       .subscribe({
         next: () => {
           const currentData = { ...this.data() };
@@ -144,7 +158,9 @@ export class Admin implements OnInit {
           this.data.set(currentData);
           this.showToast(`Post #${postId} deleted.`, 'success');
         },
-        error: (err) => this.showToast(err?.error?.message || 'Unable to delete post.', 'error'),
+        error: (err) =>{ console.log(err);
+        
+           this.showToast(err?.error?.message || 'Unable to delete post.', 'error')},
       });
   }
 

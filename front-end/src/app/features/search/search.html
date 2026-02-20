@@ -7,41 +7,39 @@
         type="text"
         class="form-control"
         placeholder="Search users..."
-        [(ngModel)]="query"
-        (input)="onSearchChange()"
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event); onSearchChange()"
       />
 
       <!-- Loading -->
-      <div *ngIf="loading" class="text-muted mt-2">
+      <div *ngIf="loading()" class="text-muted mt-2">
         Searching...
       </div>
 
       <!-- Results -->
-      <ul class="list-group mt-2" *ngIf="results.length">
+      <ul class="list-group mt-2" *ngIf="results().length">
         <li
           class="list-group-item d-flex align-items-center"
-          *ngFor="let user of results"
+          *ngFor="let user of results()"
         >
-         <a
-        [routerLink]="['/profile', user?.username]"
-        class="text-decoration-none text-black fw-medium"
-      >
-        <img
-            [src]="getProfileImage(user.profileImage)"
-            class="rounded-circle me-2"
-            width="40"
-            height="40"
-          />
-          <span>{{ user.username }}</span>
-      
-      </a>
-        
+          <a
+            [routerLink]="['/profile', user?.username]"
+            class="text-decoration-none text-black fw-medium"
+          >
+            <img
+              [src]="getProfileImage(user.profileImage)"
+              class="rounded-circle me-2"
+              width="40"
+              height="40"
+            />
+            <span>{{ user.username }}</span>
+          </a>
         </li>
       </ul>
 
       <!-- No results -->
       <div
-        *ngIf="!loading && query.length >= 2 && results.length === 0"
+        *ngIf="!loading() && query().length >= 2 && results().length === 0"
         class="text-muted mt-2"
       >
         No users found

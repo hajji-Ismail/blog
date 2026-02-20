@@ -323,20 +323,29 @@ updateCommentDraft(postId: number, value: string) {
     this.editMediaPreview.set([]);
   }
 
-  private loadComments(postId: number) {
-    this.http.get<CommentDto[]>(`${this.BASE_URL}/user/comment/load`, {
-      params: { param: postId.toString() },
-      withCredentials: true
-    }).subscribe({
-      next: comments => {
-        this.profile.update(current => ({
-          ...current!,
-          post: current!.post.map(p => p.id === postId ? { ...p, comments } : p)
-        }));
-      },
-      error: () => this.showToast('Unable to load comments.', 'error')
-    });
-  }
+ private loadComments(postId: number) {
+  this.http.get<CommentDto[]>(`${this.BASE_URL}/user/comment/load`, {
+    params: { param: postId.toString() },
+    withCredentials: true
+  }).subscribe({
+    next: comments => {
+
+      const sorted = [...comments].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() -
+          new Date(a.createdAt).getTime()
+      );
+
+      this.profile.update(current => ({
+        ...current!,
+        post: current!.post.map(p =>
+          p.id === postId ? { ...p, comments: sorted } : p
+        )
+      }));
+    },
+    error: () => this.showToast('Unable to load comments.', 'error')
+  });
+}
 
   private showToast(message: string, type: 'success' | 'error') {
     this.toastMessage.set(message);

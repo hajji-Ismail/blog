@@ -45,7 +45,8 @@ public NotificationErrDto load(String username) {
             n.getNature().toString(),
             n.getSender().getUsername(),
             n.getReceiver().getUsername(),
-            Boolean.TRUE.equals(n.getRead())
+            Boolean.TRUE.equals(n.getRead()),
+            n.getReceiver().getProfileImageUrl()
         ))
         .toList();
 
@@ -82,8 +83,7 @@ public NotificationErrDto load(String username) {
         }
 
         NotificationEntity entity = notification.get();
-        entity.setRead(true);
-        repo.save(entity);
+        this.repo.delete(entity);
         return new NotificationErrDto();
     }
         public void SaveUserReports(UserEntity user){
