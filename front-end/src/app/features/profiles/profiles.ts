@@ -15,57 +15,53 @@ import { finalize } from 'rxjs';
   imports: [CommonModule, FormsModule]
 })
 export class ProfilesComponent implements OnInit {
-  profile?: ProfileDto;
-  loading = signal<boolean> (true);
-  userName!: string;
 
-  editingPost?: PostFeedResponse;
-  editTitle = '';
-  editContent = '';
-  editFiles: File[] = [];
-  editMediaPreview: string[] = [];
+  profile = signal<ProfileDto | undefined>(undefined);
+  loading = signal<boolean>(true);
+  userName = signal<string>('');
 
-  deletingPost?: PostFeedResponse;
+  editingPost = signal<PostFeedResponse | undefined>(undefined);
+  editTitle = signal<string>('');
+  editContent = signal<string>('');
+  editFiles = signal<File[]>([]);
+  editMediaPreview = signal<string[]>([]);
 
-  reportMode?: 'user' | 'post';
-  reportingPost?: PostFeedResponse;
-  reportReason = '';
+  deletingPost = signal<PostFeedResponse | undefined>(undefined);
 
-  toastMessage = '';
-  toastType: 'success' | 'error' = 'success';
+  reportMode = signal<'user' | 'post' | undefined>(undefined);
+  reportingPost = signal<PostFeedResponse | undefined>(undefined);
+  reportReason = signal<string>('');
 
-  commentDraft: Record<number, string> = {};
+  toastMessage = signal<string>('');
+  toastType = signal<'success' | 'error'>('success');
+
+  commentDraft = signal<Record<number, string>>({});
 
   private readonly BASE_URL = 'http://localhost:8080/api/v1';
 
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-
     this.route.paramMap.subscribe(params => {
-      this.userName = params.get('username')!;
-      this.profile = undefined; // reset to show loading
+      this.userName.set(params.get('username')!);
+      this.profile.set(undefined);
       this.loadProfile();
     });
   }
 
-
   loadProfile() {
-    this.loading.set(true) ;
-    const params = new HttpParams().set('param', this.userName);
+    this.loading.set(true);
+
+    const params = new HttpParams().set('param', this.userName());
 
     this.http.get<ProfileDto>(`${this.BASE_URL}/user/profile/profile`, { params, withCredentials: true })
-      .pipe(finalize(() => {
-    this.loading.set(false) ;
-      }))
+      .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (res) => {
-          console.log(res);
-          
-                    this.profile = {
+          this.profile.set({
             ...res,
             post: (res.post ?? []).map(post => ({
               ...post,
@@ -73,127 +69,163 @@ export class ProfilesComponent implements OnInit {
               display: false,
               comments: []
             }))
-          };
+          });
         },
-        error: () => {
-          this.showToast('Unable to load profile.', 'error');
-        }
+        error: () => this.showToast('Unable to load profile.', 'error')
       });
   }
-
 
   getProfileImage(url: string | null | undefined) {
     return getProfileImage(url);
   }
 
+  // ===================== FOLLOW =====================
   onFollow(username: string) {
-    this.http.post(`${this.BASE_URL}/user/profile/follow`, { followed: username, Followed: username }, { withCredentials: true })
-      .subscribe({
-        next: () => {
-  if (!this.profile) return;
+ console.log("cdcdcfddssdfdfdssdsdfqsdfsdfqsdfqsdfqsdf");
+ 
+    this.http.post(`${this.BASE_URL}/user/profile/follow`,
+      { followed: username, Followed: username },
+      { withCredentials: true }
+    ).subscribe({
+      next: (res) => {
+        console.log(res, "dscdcdcvdfcdcdc");
+        
+      this.profile.update(current => ({
+      ...current!,
+      isFollowing: !current!.isFollowing,
+      following: current!.following + (current!.isFollowing ? -1 : 1)
+    }));
 
-  const currentlyFollowing = this.profile.isFollowing;
-
-  this.profile.isFollowing = !currentlyFollowing;
-  this.profile.following += currentlyFollowing ? -1 : 1;
-},
-          
+      },
+      error: (res) => {
+        // console.log(res);
         
         
-        error: () => this.showToast('Unable to update follow state.', 'error')
-      });
+        this.profile.update(current => ({
+          ...current!,
+          isFollowing: !current!.isFollowing,
+          following: current!.following + (current!.isFollowing ? -1 : 1)
+        }));
+        this.showToast('Unable to update follow state.', 'error');
+      }
+    });
   }
-
+updateCommentDraft(postId: number, value: string) {
+  this.commentDraft.update(d => ({ ...d, [postId]: value }));
+}
+  // ===================== REACT =====================
   onReact(post: PostFeedResponse) {
+    this.profile.update(current => ({
+      ...current!,
+      post: current!.post.map(p => {
+        if (p.id !== post.id) return p;
+        const reacted = !p.reacted;
+        return { ...p, reacted, reactionCount: reacted ? p.reactionCount + 1 : p.reactionCount - 1 };
+      })
+    }));
+
     this.http.post(`${this.BASE_URL}/user/post/react`, post.id, { withCredentials: true })
       .subscribe({
-        next: () => {
-          if (!this.profile) return;
-          this.profile.post = this.profile.post.map(p => {
-            if (p.id !== post.id) return p;
-            const reacted = !p.reacted;
-            return {
-              ...p,
-              reacted,
-              reactionCount: reacted ? p.reactionCount + 1 : p.reactionCount - 1
-            };
-          });
-        },
-        error: () => this.showToast('Unable to react to post.', 'error')
+        next: () => {},
+        error: () => {
+          // rollback
+          this.profile.update(current => ({
+            ...current!,
+            post: current!.post.map(p => {
+              if (p.id !== post.id) return p;
+              const reacted = !p.reacted;
+              return { ...p, reacted, reactionCount: reacted ? p.reactionCount + 1 : p.reactionCount - 1 };
+            })
+          }));
+          this.showToast('Unable to react to post.', 'error');
+        }
       });
   }
 
+  // ===================== COMMENTS =====================
   toggleComments(post: PostFeedResponse) {
-    if (!this.profile) return;
+    this.profile.update(current => ({
+      ...current!,
+      post: current!.post.map(p => p.id === post.id ? { ...p, display: !p.display } : p)
+    }));
 
-    this.profile.post = this.profile.post.map(p =>
-      p.id === post.id ? { ...p, display: !p.display } : p
-    );
-
-    const updated = this.profile.post.find(p => p.id === post.id);
-    if (!updated?.display) return;
-
-    this.loadComments(post.id);
+    const updated = this.profile()!.post.find(p => p.id === post.id);
+    if (updated?.display) this.loadComments(post.id);
   }
 
   onComment(post: PostFeedResponse) {
-    const content = (this.commentDraft[post.id] ?? '').trim();
+    const draft = this.commentDraft();
+    const content = (draft[post.id] ?? '').trim();
     if (!content) return;
 
-    this.http.post(`${this.BASE_URL}/user/comment/save`, { postId: post.id, content }, { withCredentials: true })
-      .subscribe({
-        next: () => {
-          this.commentDraft[post.id] = '';
+    // Optimistic comment count update
+    this.profile.update(current => ({
+      ...current!,
+      post: current!.post.map(p => p.id === post.id ? { ...p, commentCount: p.commentCount + 1 } : p)
+    }));
+    this.commentDraft.set({ ...draft, [post.id]: '' });
 
-          if (!this.profile) return;
-          this.profile.post = this.profile.post.map(p =>
-            p.id === post.id ? { ...p, commentCount: p.commentCount + 1 } : p
-          );
-
-          if (post.display) {
-            this.loadComments(post.id);
-          }
-        },
-        error: () => this.showToast('Unable to post comment.', 'error')
-      });
+    this.http.post(`${this.BASE_URL}/user/comment/save`,
+      { postId: post.id, content },
+      { withCredentials: true }
+    ).subscribe({
+      next: () => {
+        if (post.display) this.loadComments(post.id);
+      },
+      error: () => {
+        // rollback
+        this.profile.update(current => ({
+          ...current!,
+          post: current!.post.map(p => p.id === post.id ? { ...p, commentCount: p.commentCount - 1 } : p)
+        }));
+        this.showToast('Unable to post comment.', 'error');
+      }
+    });
   }
 
+  // ===================== REPORT =====================
   openReportPost(post: PostFeedResponse) {
-    this.reportMode = 'post';
-    this.reportingPost = post;
-    this.reportReason = '';
+    this.reportMode.set('post');
+    this.reportingPost.set(post);
+    this.reportReason.set('');
   }
 
   openReportUser() {
-    this.reportMode = 'user';
-    this.reportingPost = undefined;
-    this.reportReason = '';
+    this.reportMode.set('user');
+    this.reportingPost.set(undefined);
+    this.reportReason.set('');
   }
 
   closeReportModal() {
-    this.reportMode = undefined;
-    this.reportingPost = undefined;
-    this.reportReason = '';
+    this.reportMode.set(undefined);
+    this.reportingPost.set(undefined);
+    this.reportReason.set('');
   }
 
   submitReport() {
-    if (!this.profile || !this.reportMode) return;
+    const current = this.profile();
+    if (!current || !this.reportMode()) return;
 
-    const reason = this.reportReason.trim();
+    const reason = this.reportReason().trim();
     if (!reason) {
       this.showToast('Please provide a report reason.', 'error');
       return;
     }
 
-    const postId = this.reportMode === 'post' ? this.reportingPost?.id ?? null : null;
+    const postId = this.reportMode() === 'post'
+      ? this.reportingPost()?.id ?? null
+      : null;
+
     const payload = {
-      Username: this.reportMode === 'post' ? this.reportingPost?.username : this.profile.username,
+      Username: this.reportMode() === 'post'
+        ? this.reportingPost()?.username
+        : current.username,
       reason,
       Post_id: postId,
       post_id: postId
     };
 
-    const endpoint = this.reportMode === 'post'
+    const endpoint = this.reportMode() === 'post'
       ? `${this.BASE_URL}/user/report/post`
       : `${this.BASE_URL}/user/report/user`;
 
@@ -203,22 +235,24 @@ export class ProfilesComponent implements OnInit {
           this.closeReportModal();
           this.showToast('Report submitted successfully.', 'success');
         },
-        error: (err) => this.showToast(err?.error?.message || 'Unable to submit report.', 'error')
+        error: () => this.showToast('Unable to submit report.', 'error')
       });
   }
 
+  // ===================== DELETE =====================
   openDelete(post: PostFeedResponse) {
-    this.deletingPost = post;
+    this.deletingPost.set(post);
   }
 
   closeDeleteModal() {
-    this.deletingPost = undefined;
+    this.deletingPost.set(undefined);
   }
 
   confirmDelete() {
-    if (!this.deletingPost) return;
+    const post = this.deletingPost();
+    if (!post) return;
 
-    this.http.post(`${this.BASE_URL}/user/post/delete`, this.deletingPost.id, { withCredentials: true })
+    this.http.post(`${this.BASE_URL}/user/post/delete`, post.id, { withCredentials: true })
       .subscribe({
         next: () => {
           this.closeDeleteModal();
@@ -229,10 +263,11 @@ export class ProfilesComponent implements OnInit {
       });
   }
 
+  // ===================== EDIT =====================
   openEdit(post: PostFeedResponse) {
-    this.editingPost = post;
-    this.editTitle = post.title;
-    this.editContent = post.content;
+    this.editingPost.set(post);
+    this.editTitle.set(post.title);
+    this.editContent.set(post.content);
     this.clearEditSelection();
   }
 
@@ -241,15 +276,16 @@ export class ProfilesComponent implements OnInit {
     const files = Array.from(input.files ?? []);
 
     this.clearEditSelection();
-    this.editFiles = files;
-    this.editMediaPreview = files.map(file => URL.createObjectURL(file));
+    this.editFiles.set(files);
+    this.editMediaPreview.set(files.map(file => URL.createObjectURL(file)));
   }
 
   saveEdit() {
-    if (!this.editingPost) return;
+    const post = this.editingPost();
+    if (!post) return;
 
-    const title = this.editTitle.trim();
-    const content = this.editContent.trim();
+    const title = this.editTitle().trim();
+    const content = this.editContent().trim();
 
     if (!title || !content) {
       this.showToast('Title and content are required.', 'error');
@@ -257,13 +293,11 @@ export class ProfilesComponent implements OnInit {
     }
 
     const formData = new FormData();
-    formData.append('ID', this.editingPost.id.toString());
+    formData.append('ID', post.id.toString());
     formData.append('title', title);
     formData.append('content', content);
 
-    this.editFiles.forEach(file => {
-      formData.append('mediaFiles', file);
-    });
+    this.editFiles().forEach(file => formData.append('mediaFiles', file));
 
     this.http.post(`${this.BASE_URL}/user/post/edit`, formData, { withCredentials: true })
       .subscribe({
@@ -277,16 +311,16 @@ export class ProfilesComponent implements OnInit {
   }
 
   cancelEdit() {
-    this.editingPost = undefined;
-    this.editTitle = '';
-    this.editContent = '';
+    this.editingPost.set(undefined);
+    this.editTitle.set('');
+    this.editContent.set('');
     this.clearEditSelection();
   }
 
   private clearEditSelection() {
-    this.editFiles = [];
-    this.editMediaPreview.forEach(url => URL.revokeObjectURL(url));
-    this.editMediaPreview = [];
+    this.editFiles.set([]);
+    this.editMediaPreview().forEach(url => URL.revokeObjectURL(url));
+    this.editMediaPreview.set([]);
   }
 
   private loadComments(postId: number) {
@@ -295,22 +329,22 @@ export class ProfilesComponent implements OnInit {
       withCredentials: true
     }).subscribe({
       next: comments => {
-        if (!this.profile) return;
-        this.profile.post = this.profile.post.map(p =>
-          p.id === postId ? { ...p, comments } : p
-        );
+        this.profile.update(current => ({
+          ...current!,
+          post: current!.post.map(p => p.id === postId ? { ...p, comments } : p)
+        }));
       },
       error: () => this.showToast('Unable to load comments.', 'error')
     });
   }
 
   private showToast(message: string, type: 'success' | 'error') {
-    this.toastMessage = message;
-    this.toastType = type;
+    this.toastMessage.set(message);
+    this.toastType.set(type);
 
     setTimeout(() => {
-      if (this.toastMessage === message) {
-        this.toastMessage = '';
+      if (this.toastMessage() === message) {
+        this.toastMessage.set('');
       }
     }, 3000);
   }

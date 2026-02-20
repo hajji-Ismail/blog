@@ -1,25 +1,26 @@
 <!-- Profile Container -->
-<div *ngIf="!loading() && profile; " class="container py-4">
+<div *ngIf="!loading() && profile()" class="container py-4">
   <!-- Toast -->
-  <div *ngIf="toastMessage" class="profile-toast" [ngClass]="toastType === 'success' ? 'toast-success' : 'toast-error'">
-    {{ toastMessage }}
+  <div *ngIf="toastMessage()" class="profile-toast"
+    [ngClass]="toastType() === 'success' ? 'toast-success' : 'toast-error'">
+    {{ toastMessage() }}
   </div>
 
   <!-- Profile Header -->
   <div class="card profile-header shadow-sm mb-4">
     <div class="card-body d-flex align-items-center gap-3">
-      <img [src]="getProfileImage(profile.profileImage)" class="rounded-circle border" width="80" height="80" />
+      <img [src]="getProfileImage(profile()!.profileImage)" class="rounded-circle border" width="80" height="80" />
       <div class="flex-grow-1">
-        <h5 class="mb-1">{{ profile.username }}</h5>
+        <h5 class="mb-1">{{ profile()!.username }}</h5>
         <div class="d-flex gap-3 text-muted small">
-          <span><strong>{{ profile.followers }}</strong> Followers</span>
-          <span><strong>{{ profile.following }}</strong> Following</span>
+          <span><strong>{{ profile()!.followers }}</strong> Followers</span>
+          <span><strong>{{ profile()!.following }}</strong> Following</span>
         </div>
       </div>
 
-      <div *ngIf="!profile.profile" class="d-flex gap-2">
-        <button class="btn btn-primary btn-sm" (click)="onFollow(profile.username)">
-          {{ profile.isFollowing ? 'Unfollow' : 'Follow' }}
+      <div *ngIf="!profile()!.profile" class="d-flex gap-2">
+        <button class="btn btn-primary btn-sm" (click)="onFollow(profile()!.username)">
+          {{ profile()!.isFollowing ? 'Unfollow' : 'Follow' }}
         </button>
         <button class="btn btn-outline-danger btn-sm" (click)="openReportUser()">Report User</button>
       </div>
@@ -27,10 +28,10 @@
   </div>
 
   <!-- No posts message -->
-  <div *ngIf="profile.post.length === 0" class="text-center text-muted py-4">No posts yet</div>
+  <div *ngIf="profile()!.post.length === 0" class="text-center text-muted py-4">No posts yet</div>
 
   <!-- Posts -->
-  <div *ngFor="let post of profile.post" class="card mb-3 shadow-sm post-card">
+  <div *ngFor="let post of profile()!.post" class="card mb-3 shadow-sm post-card">
     <div class="card-body">
       <!-- Post Header -->
       <div class="d-flex align-items-center gap-2 mb-2">
@@ -50,7 +51,8 @@
 
       <!-- Post Actions -->
       <div class="d-flex align-items-center gap-3 border-top pt-2 post-actions">
-        <button class="btn btn-link p-0 d-flex align-items-center gap-1" [class.reacted]="post.reacted" (click)="onReact(post)">
+        <button class="btn btn-link p-0 d-flex align-items-center gap-1" [class.reacted]="post.reacted"
+          (click)="onReact(post)">
           <i class="bi bi-heart-fill"></i>
           <span>{{ post.reactionCount }}</span>
         </button>
@@ -60,20 +62,15 @@
           <span>{{ post.commentCount }}</span>
         </button>
 
-        <span class="ms-auto" *ngIf="!profile.profile">
+        <span class="ms-auto" *ngIf="!profile()!.profile">
           <button class="btn btn-sm btn-outline-danger" (click)="openReportPost(post)">Report Post</button>
         </span>
       </div>
 
       <!-- Comment Input -->
       <div class="d-flex gap-2 mt-2">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Write a comment..."
-          [(ngModel)]="commentDraft[post.id]"
-          (keyup.enter)="onComment(post)"
-        />
+        <input type="text" class="form-control" placeholder="Write a comment..." [ngModel]="commentDraft()[post.id]"
+          (ngModelChange)="updateCommentDraft(post.id, $event)" (keyup.enter)="onComment(post)" />
         <button class="btn btn-primary btn-sm" (click)="onComment(post)">Send</button>
       </div>
 
@@ -94,7 +91,7 @@
       </div>
 
       <!-- Edit/Delete buttons if it's the user's profile -->
-      <div class="mt-3 d-flex gap-2" *ngIf="profile.profile">
+      <div class="mt-3 d-flex gap-2" *ngIf="profile()!.profile">
         <button class="btn btn-sm btn-warning" (click)="openEdit(post)">Edit</button>
         <button class="btn btn-sm btn-danger" (click)="openDelete(post)">Delete</button>
       </div>
@@ -102,22 +99,22 @@
   </div>
 </div>
 
-
 <!-- Edit Post Modal -->
-<div *ngIf="editingPost" class="overlay">
+<div *ngIf="editingPost()" class="overlay">
   <div class="modal-card">
     <h5 class="mb-3">Edit Post</h5>
 
     <label class="small mb-1">Title</label>
-    <input [(ngModel)]="editTitle" class="form-control mb-2" />
+    <input [ngModel]="editTitle()" (ngModelChange)="editTitle.set($event)" class="form-control mb-2" />
 
     <label class="small mb-1">Content</label>
-    <textarea [(ngModel)]="editContent" class="form-control mb-3" rows="4"></textarea>
+    <textarea [ngModel]="editContent()" (ngModelChange)="editContent.set($event)" class="form-control mb-3"
+      rows="4"></textarea>
 
     <div class="mb-2">
       <label class="small d-block">Current images</label>
       <div class="media-grid mb-2">
-        <img *ngFor="let m of editingPost.medias" [src]="m" class="img-fluid rounded" />
+        <img *ngFor="let m of editingPost()!.medias" [src]="m" class="img-fluid rounded" />
       </div>
     </div>
 
@@ -127,10 +124,10 @@
       <small class="text-muted">Selecting new images replaces existing ones.</small>
     </div>
 
-    <div *ngIf="editMediaPreview.length" class="mb-3">
+    <div *ngIf="editMediaPreview().length" class="mb-3">
       <label class="small d-block">Preview</label>
       <div class="media-grid">
-        <img *ngFor="let preview of editMediaPreview" [src]="preview" class="img-fluid rounded" />
+        <img *ngFor="let preview of editMediaPreview()" [src]="preview" class="img-fluid rounded" />
       </div>
     </div>
 
@@ -142,10 +139,10 @@
 </div>
 
 <!-- Delete Post Modal -->
-<div *ngIf="deletingPost" class="overlay">
+<div *ngIf="deletingPost()" class="overlay">
   <div class="modal-card">
     <h5>Delete Post</h5>
-    <p class="mb-3">Are you sure you want to delete <strong>{{ deletingPost.title }}</strong>?</p>
+    <p class="mb-3">Are you sure you want to delete <strong>{{ deletingPost()!.title }}</strong>?</p>
     <div class="d-flex justify-content-end gap-2">
       <button class="btn btn-secondary btn-sm" (click)="closeDeleteModal()">Cancel</button>
       <button class="btn btn-danger btn-sm" (click)="confirmDelete()">Delete</button>
@@ -154,18 +151,14 @@
 </div>
 
 <!-- Report Modal -->
-<div *ngIf="reportMode" class="overlay">
-  <div class="modal-card">f) ;
-    <h5 class="mb-2">{{ reportMode === 'post' ? 'Report Post' : 'Report User' }}</h5>
-    <p class="small text-muted mb-2" *ngIf="reportMode === 'post'">Target: {{ reportingPost?.username }}'s post</p>
-    <p class="small text-muted mb-2" *ngIf="reportMode === 'user'">Target: {{ profile?.username }}</p>
+<div *ngIf="reportMode()" class="overlay">
+  <div class="modal-card">
+    <h5 class="mb-2">{{ reportMode() === 'post' ? 'Report Post' : 'Report User' }}</h5>
+    <p class="small text-muted mb-2" *ngIf="reportMode() === 'post'">Target: {{ reportingPost()?.username }}'s post</p>
+    <p class="small text-muted mb-2" *ngIf="reportMode() === 'user'">Target: {{ profile()!.username }}</p>
 
-    <textarea
-      [(ngModel)]="reportReason"
-      class="form-control mb-3"
-      rows="4"
-      placeholder="Describe the issue"
-    ></textarea>
+    <textarea [ngModel]="reportReason()" (ngModelChange)="reportReason.set($event)" class="form-control mb-3" rows="4"
+      placeholder="Describe the issue"></textarea>
 
     <div class="d-flex justify-content-end gap-2">
       <button class="btn btn-secondary btn-sm" (click)="closeReportModal()">Cancel</button>
