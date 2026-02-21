@@ -10,5 +10,9 @@ import com.ihajji.backend.user.entity.UserEntity;
 public interface ReportUserRepository extends JpaRepository <ReportUserEntity, Long> {
      List<ReportUserEntity> findAll();  
        void deleteByReported(UserEntity reported);
+       
+void deleteByReporter(UserEntity reporter);
+
+
 
 }

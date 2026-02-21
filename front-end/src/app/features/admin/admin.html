@@ -114,6 +114,11 @@
                 [class.btn-outline-success]="user.baned" (click)="toggleBan(user)">
                 {{ user.baned ? 'Unban' : 'Ban' }}
               </button>
+
+              <!-- NEW DELETE BUTTON -->
+              <button *ngIf="user.role !== 'ADMIN'" class="btn btn-sm btn-outline-dark" (click)="deleteUser(user)">
+                Delete
+              </button>
             </li>
           </ul>
         </div>

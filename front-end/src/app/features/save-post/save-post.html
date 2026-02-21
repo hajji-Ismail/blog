@@ -58,6 +58,10 @@
           <span *ngIf="isSaving()">Saving...</span>
         </button>
       </form>
+      <div *ngIf="fileLimitError()" class="alert alert-danger">
+        {{ fileLimitError() }}
+      </div>
     </div>
   </div>
+
 </div>

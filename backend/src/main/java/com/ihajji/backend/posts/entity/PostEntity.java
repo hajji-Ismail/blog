@@ -1,12 +1,14 @@
 package com.ihajji.backend.posts.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.annotation.CreatedDate;
 
+import com.ihajji.backend.reports.Entity.ReportPostEntity;
 import com.ihajji.backend.user.entity.UserEntity;
 
 import jakarta.persistence.CascadeType;
@@ -57,6 +59,10 @@ private Set<MediaEntity> medias = new HashSet<>();
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+@OneToMany(mappedBy = "post",
+           cascade = CascadeType.ALL,
+           orphanRemoval = true)
+private List<ReportPostEntity> postReports = new ArrayList<>();
 
     public String getContent() {
         return content;
@@ -74,6 +80,10 @@ private Set<MediaEntity> medias = new HashSet<>();
         return title;
     }
 
+    public List<ReportPostEntity> getPostReports() {
+        return postReports;
+    }
+
     public void setContent(String content) {
         this.content = content;
     }
@@ -81,6 +91,11 @@ private Set<MediaEntity> medias = new HashSet<>();
     public void setId(Long id) {
         this.id = id;
     }
+
+    public void setPostReports(List<ReportPostEntity> postReports) {
+        this.postReports = postReports;
+    }
+    
 
     public void setTitle(String title) {
         this.title = title;

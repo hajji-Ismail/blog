@@ -62,6 +62,15 @@ public class PostService {
         errors.setMessage("Please revise your input fields.");
         return errors;
     }
+    if (dto.mediaFiles() != null && dto.mediaFiles().size() > 5) {
+        errors.setCode(HttpStatus.SC_BAD_REQUEST);
+        errors.setMessage("Maximum 5 files allowed.");
+                return errors;
+
+    }
+
+  
+   
 
     UserEntity user = UserRepository.findByUsername(username)
             .orElseThrow(() -> new IllegalStateException("User not found"));

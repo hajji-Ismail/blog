@@ -36,6 +36,8 @@ public class NotificationEntity {
   @Column(name = "is_read")
   private Boolean read = false;
 
+    
+
     public Long getId() {
         return id;
     }
@@ -60,6 +62,8 @@ public class NotificationEntity {
     public Boolean getRead() {
         return read;
     }
+
+
 
     public void setId(Long id) {
         this.id = id;

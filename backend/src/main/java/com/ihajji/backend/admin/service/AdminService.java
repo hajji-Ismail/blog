@@ -12,6 +12,7 @@ import com.ihajji.backend.admin.dto.AdminErrorDto;
 import com.ihajji.backend.admin.dto.AdminPostReportDto;
 import com.ihajji.backend.admin.dto.AdminUserDto;
 import com.ihajji.backend.admin.dto.AdminUserReportDto;
+import com.ihajji.backend.notification.repository.NotificationRepository;
 import com.ihajji.backend.posts.entity.PostEntity;
 import com.ihajji.backend.posts.repository.CommentRepository;
 import com.ihajji.backend.posts.repository.PostRepository;
@@ -29,16 +30,18 @@ public class AdminService {
     final CommentRepository commentRepo;
     final ReportPostRepository reportPostRepo;
     final ReportService ReportService;
+    
   
     final UserService UserService;
       final ReportUserRepository ReportUser;
+      final NotificationRepository not;
     AdminService(
             UserRepository userrepo,
             PostRepository postrepo,
             CommentRepository commentRepo,
             ReportPostRepository reportPostRepo,
             ReportService ReportService,
-            UserService UserService, ReportUserRepository ReportUser){
+            UserService UserService, ReportUserRepository ReportUser, NotificationRepository not){
         this.postrepo= postrepo;
         this.userrepo = userrepo;
         this.commentRepo = commentRepo;
@@ -46,6 +49,7 @@ public class AdminService {
         this.ReportService = ReportService;
         this.UserService = UserService;
         this.ReportUser = ReportUser;
+        this.not = not;
     }
     @Transactional
     public AdminErrorDto BannedUser(AdminUserDto dto){
@@ -118,6 +122,27 @@ public class AdminService {
                 this.UserService.GetUsers(),
                 postReports,
                 userReports);
+
+    }
+    @Transactional
+    public AdminErrorDto delet(String username , String Adminuser){
+         Optional<UserEntity>  Admin = this.userrepo.findByUsername(Adminuser);
+        if (!Admin.isPresent()){
+            return  new AdminErrorDto(HttpStatus.SC_BAD_REQUEST, "the user can't be found");
+        }
+
+
+        Optional<UserEntity> user = this.userrepo.findByUsername(username);
+        if (!user.isPresent()){
+            return  new AdminErrorDto(HttpStatus.SC_BAD_REQUEST, "the user can't be found");
+        }
+        this.reportPostRepo.deleteByReporter(user.get());
+        this.ReportUser.deleteByReported(user.get());
+        this.ReportUser.deleteByReporter(user.get());
+this.not.deleteByReceiver(user.get());
+this.not.deleteBySender(user.get());
+        this.userrepo.delete(user.get());
+        return new AdminErrorDto();
 
     }
     

@@ -163,7 +163,47 @@ toggleBan(user: User) {
            this.showToast(err?.error?.message || 'Unable to delete post.', 'error')},
       });
   }
+deleteUser(user: User) {
 
+  if (user.role === 'ADMIN') {
+    this.showToast('Administrators cannot be deleted.', 'error');
+    return;
+  }
+
+  const confirmed = confirm(`Are you sure you want to permanently delete user "${user.username}"?`);
+
+  if (!confirmed) return;
+
+  this.http.post(
+    'http://localhost:8080/api/v1/admin/deletUser',
+    null,
+    {
+      params: { username: user.username },
+      withCredentials: true
+    }
+  ).subscribe({
+    next: () => {
+
+      const currentData = { ...this.data() };
+
+      // remove user from list
+      currentData.users = currentData.users.filter(u => u.username !== user.username);
+
+      // update counters
+      if (user.baned) {
+        currentData.numberOfBandUser = Math.max(0, currentData.numberOfBandUser - 1);
+      } else {
+        currentData.numberOfUnbandUser = Math.max(0, currentData.numberOfUnbandUser - 1);
+      }
+
+      this.data.set(currentData);
+
+      this.showToast(`User ${user.username} deleted successfully.`, 'success');
+    },
+    error: (err) =>
+      this.showToast(err?.error?.message || 'Unable to delete user.', 'error'),
+  });
+}
   private showToast(message: string, type: 'success' | 'error') {
     this.toastMessage.set(message);
     this.toastType.set(type);

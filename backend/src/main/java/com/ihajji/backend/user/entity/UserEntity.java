@@ -1,9 +1,11 @@
 package com.ihajji.backend.user.entity;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ihajji.backend.posts.entity.PostEntity;
+import com.ihajji.backend.profile.entity.ProfileEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -39,11 +41,27 @@ public class UserEntity {
 
     private String profileImageUrl;
 
- 
+ @OneToMany(mappedBy = "follower",
+           cascade = CascadeType.ALL,
+           orphanRemoval = true)
+private List<ProfileEntity> following = new ArrayList<>();
+
+@OneToMany(mappedBy = "following",
+           cascade = CascadeType.ALL,
+           orphanRemoval = true)
+private List<ProfileEntity> followers = new ArrayList<>();
 
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public List<ProfileEntity> getFollowers() {
+        return followers;
+    }
+
+    public List<ProfileEntity> getFollowing() {
+        return following;
+    }
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }

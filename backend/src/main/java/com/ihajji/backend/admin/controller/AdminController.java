@@ -1,6 +1,7 @@
 package com.ihajji.backend.admin.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,6 +12,7 @@ import com.ihajji.backend.admin.dto.AdminDataDto;
 import com.ihajji.backend.admin.dto.AdminErrorDto;
 import com.ihajji.backend.admin.dto.AdminUserDto;
 import com.ihajji.backend.admin.service.AdminService;
+import com.ihajji.backend.user.config.UserPrincipal;
 
 
 
@@ -42,6 +44,12 @@ public class AdminController {
     @GetMapping("load")
     public ResponseEntity<AdminDataDto> load( ) {
         return ResponseEntity.ok().body(this.service.Load());
+    }
+    @PostMapping("deletUser")
+    public ResponseEntity<AdminErrorDto> DeletUser(String username, @AuthenticationPrincipal UserPrincipal principal){
+        AdminErrorDto data = this.service.delet(username, principal.getUsername());
+        return ResponseEntity.status(data.getCode()).body(data);
+
     }
     
     

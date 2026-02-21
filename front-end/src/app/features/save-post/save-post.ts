@@ -17,7 +17,8 @@ export class SavePost implements OnInit {
   contentError = signal<string>('');
 isSaving = signal<boolean>(false);
   postForm!: FormGroup;
-
+readonly MAX_FILES = 5;
+fileLimitError = signal<string>('');
   // Store selected media files with preview
   selectedMedia: { file: File; preview: string; type: string }[] = [];
 
@@ -36,28 +37,45 @@ isSaving = signal<boolean>(false);
   }
 
   /** Triggered when files are selected */
-  onFilesSelected(event: any) {
-    const files: File[] = Array.from(event.target.files);
+ onFilesSelected(event: any) {
+  const files: File[] = Array.from(event.target.files);
 
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        // Add file immediately for preview
-        this.selectedMedia.push({
-          file,
-          preview: e.target.result,
-          type: file.type,
-        });
+  // Remaining slots
+  const remainingSlots = this.MAX_FILES - this.selectedMedia.length;
 
-        // Force Angular to update the template immediately
-        this.cdr.detectChanges();
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // Reset input so the same file can be selected again
+  if (remainingSlots <= 0) {
+    this.fileLimitError.set(`Maximum ${this.MAX_FILES} files allowed.`);
     event.target.value = '';
+    return;
   }
+
+  if (files.length > remainingSlots) {
+    this.fileLimitError.set(
+      `You can only upload ${this.MAX_FILES} files total.`
+    );
+  } else {
+    this.fileLimitError.set('');
+  }
+
+  // Only take allowed number of files
+  const allowedFiles = files.slice(0, remainingSlots);
+
+  allowedFiles.forEach((file) => {
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.selectedMedia.push({
+        file,
+        preview: e.target.result,
+        type: file.type,
+      });
+
+      this.cdr.detectChanges();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  event.target.value = '';
+}
 
   /** Remove a media file */
   removeMedia(index: number) {
@@ -66,6 +84,10 @@ isSaving = signal<boolean>(false);
 
 submitPost() {
 
+  if (this.selectedMedia.length > this.MAX_FILES) {
+    this.fileLimitError.set(`Maximum ${this.MAX_FILES} files allowed.`);
+    return;
+  }
   if (this.isSaving()) return;
 
   if (this.postForm.invalid) {
