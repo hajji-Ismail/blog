@@ -136,6 +136,9 @@ public class AdminService {
         if (!user.isPresent()){
             return  new AdminErrorDto(HttpStatus.SC_BAD_REQUEST, "the user can't be found");
         }
+        if(user.get().getRole().equals("ADMIN")){
+              return  new AdminErrorDto(HttpStatus.SC_BAD_REQUEST, "the admin can't be deleted");
+        }
         this.reportPostRepo.deleteByReporter(user.get());
         this.ReportUser.deleteByReported(user.get());
         this.ReportUser.deleteByReporter(user.get());

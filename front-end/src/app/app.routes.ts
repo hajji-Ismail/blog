@@ -34,7 +34,9 @@ export const routes: Routes = [
           authGuard, roleGuard
         ], data: { role: 'ADMIN' }
       },
+         { path: '**', redirectTo: 'home' } ,
 
     ]
-  }
+  },
+  { path: '**', redirectTo: 'home' },
 ];
