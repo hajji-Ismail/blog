@@ -37,7 +37,7 @@ public class CommentController {
     }
 
     @GetMapping("/load")
-    public ResponseEntity<List<CommentDto>> load(@RequestParam Long param) {
+    public ResponseEntity<List<CommentDto>> load(@RequestParam Long param,@AuthenticationPrincipal UserPrincipal principal) {
         List<CommentDto> comments = this.service.load(param);
         return ResponseEntity.ok(comments);
     }

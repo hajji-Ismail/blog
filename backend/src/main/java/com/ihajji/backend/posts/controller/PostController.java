@@ -46,7 +46,7 @@ public class PostController {
     public ResponseEntity<List<PostFeedResponse>> Load(@AuthenticationPrincipal UserPrincipal principal) {
       List<PostFeedResponse> Post =this.PostService.getPostFeed(principal.getUsername());
       if(Post== null){
-        return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(Post);
+        return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).body(Post);
       }
       return ResponseEntity.ok(Post);
        

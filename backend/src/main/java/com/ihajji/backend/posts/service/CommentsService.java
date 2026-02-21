@@ -43,6 +43,10 @@ public class CommentsService {
         if (userOpt.isEmpty()) {
             return new ErrorDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "User not found");
         }
+        if (userOpt.get().getIs_baned()) {
+            return new ErrorDto(HttpStatus.SC_UNAUTHORIZED, "the user is banned");
+
+        }
 
         Optional<PostEntity> postOpt = postRepo.findById(dto.getPostId());
         if (postOpt.isEmpty()) {
@@ -60,16 +64,15 @@ public class CommentsService {
 
     public List<CommentDto> load(Long postId) {
         return repo.findByPostId(postId).stream()
-            .map(c -> new CommentDto(
-                c.getId(),
-                c.getPost().getId(),
-                c.getUser().getId(),
-                c.getContent(),
-                c.getCreatedAt(),
-                c.getUser().getUsername(),
-                c.getUser().getProfileImageUrl()
-            ))
-            .collect(Collectors.toList());
+                .map(c -> new CommentDto(
+                        c.getId(),
+                        c.getPost().getId(),
+                        c.getUser().getId(),
+                        c.getContent(),
+                        c.getCreatedAt(),
+                        c.getUser().getUsername(),
+                        c.getUser().getProfileImageUrl()))
+                .collect(Collectors.toList());
     }
 
     public ErrorDto edit(String username, CommentEditDto dto) {
@@ -87,7 +90,15 @@ public class CommentsService {
         if (commentOpt.isEmpty()) {
             return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "Comment not found");
         }
+        Optional<UserEntity> user = this.userRepo.findByUsername(username);
+        if (!user.isPresent()) {
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "user not found");
 
+        }
+        if (user.get().getIs_baned()) {
+            return new ErrorDto(HttpStatus.SC_UNAUTHORIZED, "the user is banned");
+
+        }
         CommentEntity comment = commentOpt.get();
         if (!comment.getUser().getUsername().equals(username)) {
             return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "Only the owner can edit this comment");
@@ -99,6 +110,15 @@ public class CommentsService {
     }
 
     public ErrorDto delete(String username, Long commentId) {
+        Optional<UserEntity> user = this.userRepo.findByUsername(username);
+        if (!user.isPresent()) {
+            return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "user not found");
+
+        }
+        if (user.get().getIs_baned()) {
+            return new ErrorDto(HttpStatus.SC_UNAUTHORIZED, "the user is banned");
+
+        }
         if (commentId == null) {
             return new ErrorDto(HttpStatus.SC_BAD_REQUEST, "Comment id is required");
         }

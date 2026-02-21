@@ -2,8 +2,9 @@ import { Component, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { getProfileImage } from '../../services/profile.service';
+import { AuthService } from '../../services/auth.service';
 
 interface UserSearchResult {
   id: number;
@@ -25,7 +26,7 @@ export class Search {
   results = signal<UserSearchResult[]>([]);
   loading = signal(false);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, public auth: AuthService, private router: Router) { }
 
   onSearchChange(): void {
     const currentQuery = this.query();
@@ -48,7 +49,10 @@ export class Search {
         this.loading.set(false);
       },
       error: err => {
-        console.error(err);
+        if (err.error.Code == 401) {
+          this.auth.logout()
+          this.router.navigate(['/login']);
+        }
         this.loading.set(false);
       }
     });

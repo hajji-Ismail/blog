@@ -16,21 +16,46 @@ public class FileUploadService {
     public FileUploadService(Cloudinary cloudinary) {
         this.cloudinary = cloudinary;
     }
+public String uploadFile(MultipartFile file, String folderName) throws IOException {
 
-    public String uploadFile(MultipartFile file, String folderName) throws IOException {
-        try {
-            // Options for upload: specify the target folder
-            Map uploadResult = this.cloudinary.uploader().upload(
-                file.getBytes(), 
-                ObjectUtils.asMap("folder", folderName)
-            );
-            
-            // Return the secure URL of the uploaded asset
-            return uploadResult.get("secure_url").toString();
-            
-        } catch (IOException e) {
-            // Log the exception or throw a custom runtime exception
-            throw new IOException("Failed to upload file : " + e.getMessage());
-        }
+    if (file == null || file.isEmpty()) {
+               return "";
+
     }
+
+    String contentType = file.getContentType();
+
+    if (contentType == null) {
+        return "";
+    }
+
+    String resourceType;
+
+    if (contentType.startsWith("image/")) {
+        resourceType = "image";
+
+    } else if (contentType.startsWith("video/")) {
+        resourceType = "video";
+
+    } else {
+               return "";
+
+    }
+
+    try {
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(), // safer for both images and videos
+                    ObjectUtils.asMap(
+                            "folder", folderName,
+                            "resource_type", resourceType
+                    )
+            );
+            return uploadResult.get("secure_url").toString();
+        } catch (IOException | RuntimeException e) {
+            // log the error, but do NOT crash
+            System.err.println("Cloudinary upload failed: " + e.getMessage());
+            return ""; // fail silently
+        }
+
+}
 }

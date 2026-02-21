@@ -35,6 +35,10 @@ public class ProfileService {
         if (!follower.isPresent()) {
             return new FollowerErrorDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "midleware is not working properlly");
         }
+        if(follower.get().getIs_baned()){
+                        return new FollowerErrorDto(HttpStatus.SC_UNAUTHORIZED, "you are banned");
+
+        }
 
         Optional<UserEntity> followed = userRepo.findByUsername(Dto.getFollowed());
         if (!followed.isPresent()) {
@@ -66,10 +70,13 @@ public class ProfileService {
     }
 
     public ProfileDto loadProfile(String username, String profile) {
-        Optional<UserEntity> user = this.userRepo.findByUsername(username);
+        Optional<UserEntity> user = this.userRepo.findByUsername(profile);
         if (!user.isPresent()) {
             return null;
 
+        }
+        if (user.get().getIs_baned()){
+            return null;
         }
 
         

@@ -31,6 +31,10 @@ public NotificationErrDto load(String username) {
     if (!user.isPresent()) {
         return new NotificationErrDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Middleware is not working");
     }
+    if (user.get().getIs_baned()){
+                return new NotificationErrDto(HttpStatus.SC_UNAUTHORIZED, "the user is banned");
+
+    }
 
     Optional<List<NotificationEntity>> notifications = repo.findByReceiver(user.get());
     if (!notifications.isPresent() || notifications.get().isEmpty()) {
@@ -73,6 +77,10 @@ public NotificationErrDto load(String username) {
         if (!user.isPresent()) {
             return new NotificationErrDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Middleware is not working");
         }
+          if (user.get().getIs_baned()){
+                return new NotificationErrDto(HttpStatus.SC_UNAUTHORIZED, "the user is banned");
+
+    }
         if (notificationId == null) {
             return new NotificationErrDto(HttpStatus.SC_BAD_REQUEST, "Notification id is required");
         }

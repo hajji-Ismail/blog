@@ -24,10 +24,10 @@ public class ReportService {
     final ReportPostRepository reportPost;
     final UserRepository userRepo;
     final PostRepository postRepo;
-    final NotificationServices notification ;
+    final NotificationServices notification;
 
     ReportService(ReportPostRepository reportPost, ReportUserRepository repportUser, UserRepository user,
-            PostRepository postRepo,  NotificationServices notification) {
+            PostRepository postRepo, NotificationServices notification) {
         this.reportPost = reportPost;
         this.reportUser = repportUser;
         this.userRepo = user;
@@ -43,6 +43,10 @@ public class ReportService {
         Optional<UserEntity> reporter = userRepo.findByUsername(username);
         if (!reporter.isPresent()) {
             return new ReportErrDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "midleware is not working properlly");
+        }
+        if (reporter.get().getIs_baned()) {
+            return new ReportErrDto(HttpStatus.SC_UNAUTHORIZED, "you are banned");
+
         }
         Optional<PostEntity> reportedPost = postRepo.findById(dto.getPost_id());
         if (!reportedPost.isPresent()) {
@@ -68,29 +72,34 @@ public class ReportService {
         if (!reporter.isPresent()) {
             return new ReportErrDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "midleware is not working properlly");
         }
+        if (reporter.get().getIs_baned()) {
+            return new ReportErrDto(HttpStatus.SC_UNAUTHORIZED, "you are banned");
+
+        }
         Optional<UserEntity> reported = userRepo.findByUsername(dto.getUsername());
         if (!reported.isPresent()) {
             return new ReportErrDto(HttpStatus.SC_BAD_REQUEST, "the user is not exist ");
         }
 
         ReportUserEntity response = new ReportUserEntity();
-        response.setReported(reported.get());;
+        response.setReported(reported.get());
+        ;
         response.setReason(dto.getReason());
         response.setReporter(reporter.get());
         reportUser.save(response);
         this.notification.SaveUserReports(reporter.get());
 
-
         return new ReportErrDto();
     }
-    public List<ReportPostEntity> GetPostReports(){
+
+    public List<ReportPostEntity> GetPostReports() {
         return this.reportPost.findAll();
 
     }
-     public List<ReportUserEntity> GetUserReports(){
+
+    public List<ReportUserEntity> GetUserReports() {
         return this.reportUser.findAll();
 
     }
-
 
 }

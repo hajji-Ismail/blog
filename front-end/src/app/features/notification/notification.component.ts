@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Notification } from './notification.model';
 import { CommonModule } from '@angular/common';
 import { getProfileImage } from '../../services/profile.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-notification',
@@ -17,7 +18,7 @@ export class NotificationComponent implements OnInit {
   loading = signal<boolean>(false);
   error = signal<string>('');
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(public auth: AuthService, private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
     this.loadNotifications();
@@ -47,7 +48,7 @@ export class NotificationComponent implements OnInit {
             this.notifications.set(mapped);
 
           } catch (e) {
-            console.error(e, 'Failed to parse notifications response');
+
             this.notifications.set([]);
             this.error.set('Failed to parse notifications');
           } finally {
@@ -55,8 +56,13 @@ export class NotificationComponent implements OnInit {
           }
         },
         error: (err) => {
+          
+          if (err.error.code == 401) {
+            this.auth.logout()
+            this.router.navigate(['/login']);
+
+          }
           this.loading.set(false);
-          console.error(err, "Failed to load notifications");
           this.error.set(err?.error?.message || 'Failed to load notifications');
         }
       });
@@ -71,8 +77,8 @@ export class NotificationComponent implements OnInit {
   }
 
   getProfileImage(url: string | null | undefined) {
-      return getProfileImage(url);
-    }
+    return getProfileImage(url);
+  }
   markAsRead(n: Notification, event: MouseEvent) {
     event.stopPropagation();
     if (n.read) return;
@@ -89,7 +95,13 @@ export class NotificationComponent implements OnInit {
           )
         );
       },
-      error: (err) => console.error(err, 'Failed to mark notification as read')
+      error: (err) => {
+        
+        if (err.error.code == 401) {
+          this.auth.logout()
+          this.router.navigate(['/login']);
+        }
+      }
     });
   }
 }

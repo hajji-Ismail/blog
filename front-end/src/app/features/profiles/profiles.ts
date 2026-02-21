@@ -1,11 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component, OnInit, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Route, Router } from '@angular/router';
 import { CommentDto, PostFeedResponse, ProfileDto } from './models/profile.model';
 import { CommonModule } from '@angular/common';
 import { getProfileImage } from '../../services/profile.service';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-profiles',
@@ -41,7 +42,9 @@ export class ProfilesComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public auth: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -61,6 +64,7 @@ export class ProfilesComponent implements OnInit {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (res) => {
+         
           this.profile.set({
             ...res,
             post: (res.post ?? []).map(post => ({
@@ -71,7 +75,15 @@ export class ProfilesComponent implements OnInit {
             }))
           });
         },
-        error: () => this.showToast('Unable to load profile.', 'error')
+        error: (err) =>{ 
+          
+          if (err.error == null){
+                     this.auth.logout()
+            this.router.navigate(['/login']);
+          }
+          this.showToast('Unable to load profile.', 'error')
+
+        }
       });
   }
 
@@ -81,14 +93,12 @@ export class ProfilesComponent implements OnInit {
 
   // ===================== FOLLOW =====================
   onFollow(username: string) {
- console.log("cdcdcfddssdfdfdssdsdfqsdfsdfqsdfqsdfqsdf");
  
     this.http.post(`${this.BASE_URL}/user/profile/follow`,
       { followed: username, Followed: username },
       { withCredentials: true }
     ).subscribe({
       next: (res) => {
-        console.log(res, "dscdcdcvdfcdcdc");
         
       this.profile.update(current => ({
       ...current!,
@@ -97,9 +107,11 @@ export class ProfilesComponent implements OnInit {
     }));
 
       },
-      error: (res) => {
-        // console.log(res);
-        
+      error: (err) => {
+           if (err.error.Code == 401){
+                     this.auth.logout()
+            this.router.navigate(['/login']);
+          }
         
         this.profile.update(current => ({
           ...current!,
@@ -127,8 +139,8 @@ updateCommentDraft(postId: number, value: string) {
     this.http.post(`${this.BASE_URL}/user/post/react`, post.id, { withCredentials: true })
       .subscribe({
         next: () => {},
-        error: () => {
-          // rollback
+        error: (err) => {
+         
           this.profile.update(current => ({
             ...current!,
             post: current!.post.map(p => {
@@ -137,6 +149,10 @@ updateCommentDraft(postId: number, value: string) {
               return { ...p, reacted, reactionCount: reacted ? p.reactionCount + 1 : p.reactionCount - 1 };
             })
           }));
+           if (err.error.code == 401){
+                     this.auth.logout()
+            this.router.navigate(['/login']);
+          }
           this.showToast('Unable to react to post.', 'error');
         }
       });
@@ -172,12 +188,15 @@ updateCommentDraft(postId: number, value: string) {
       next: () => {
         if (post.display) this.loadComments(post.id);
       },
-      error: () => {
-        // rollback
+      error: (err) => {
         this.profile.update(current => ({
           ...current!,
           post: current!.post.map(p => p.id === post.id ? { ...p, commentCount: p.commentCount - 1 } : p)
         }));
+         if (err.error.code == 401){
+                     this.auth.logout()
+            this.router.navigate(['/login']);
+          }
         this.showToast('Unable to post comment.', 'error');
       }
     });
@@ -235,7 +254,12 @@ updateCommentDraft(postId: number, value: string) {
           this.closeReportModal();
           this.showToast('Report submitted successfully.', 'success');
         },
-        error: () => this.showToast('Unable to submit report.', 'error')
+        error: (err) => {
+           if (err.error.code == 401){
+                     this.auth.logout()
+            this.router.navigate(['/login']);
+          }
+          this.showToast('Unable to submit report.', 'error')}
       });
   }
 
@@ -259,11 +283,17 @@ updateCommentDraft(postId: number, value: string) {
           this.showToast('Post deleted.', 'success');
           this.loadProfile();
         },
-        error: () => this.showToast('Unable to delete post.', 'error')
+        error: (err) => {
+           if (err.error.code == 401){
+                     this.auth.logout()
+            this.router.navigate(['/login']);
+          }
+          this.showToast('Unable to delete post.', 'error')
+
+        }
       });
   }
 
-  // ===================== EDIT =====================
   openEdit(post: PostFeedResponse) {
     this.editingPost.set(post);
     this.editTitle.set(post.title);
@@ -306,7 +336,13 @@ updateCommentDraft(postId: number, value: string) {
           this.showToast('Post updated.', 'success');
           this.loadProfile();
         },
-        error: () => this.showToast('Unable to update post.', 'error')
+        error: (err) => { if (err.error.code == 401){
+                     this.auth.logout()
+            this.router.navigate(['/login']);
+          }
+          this.showToast('Unable to update post.', 'error')
+
+        }
       });
   }
 

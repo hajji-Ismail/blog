@@ -4,7 +4,8 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { PostFeedDto, CommentDto } from './models/Post.models';
 import { getProfileImage } from '../../services/profile.service';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 interface CurrentUserDto {
   username: string;
@@ -28,7 +29,7 @@ export class Posts implements OnInit {
   editingCommentId: number | null = null;
   editCommentContent = '';
 
-  constructor(private http: HttpClient) { }
+  constructor(public auth: AuthService, private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
     this.loadCurrentUser();
@@ -44,7 +45,12 @@ export class Posts implements OnInit {
         next: data => {
           this.currentUsername = data.username;
         },
-        error: err => console.error(err),
+        error: err => {
+          if (err.error.Code = 401) {
+            this.auth.logout()
+            this.router.navigate(['/login']);
+          }
+        },
       });
   }
 
@@ -57,8 +63,10 @@ export class Posts implements OnInit {
       .subscribe({
         next: data => this.posts.set(data),
         error: err => {
-          console.error(err);
-          this.posts.set([]);
+          if (err.error.Code = 401) {
+            this.auth.logout()
+            this.router.navigate(['/login']);
+          } this.posts.set([]);
         },
       });
   }
@@ -94,7 +102,12 @@ export class Posts implements OnInit {
           input.value = '';
           this.loadComments(postId);
         },
-        error: err => console.error(err),
+        error: err => {
+               if (err.error.Code = 401){
+            this.auth.logout()
+          this.router.navigate(['/login']);
+          }
+        },
       });
   }
 
@@ -140,7 +153,12 @@ export class Posts implements OnInit {
           this.cancelEditComment();
           this.loadComments(postId);
         },
-        error: err => console.error(err),
+        error: err => {
+               if (err.error.Code = 401){
+            this.auth.logout()
+          this.router.navigate(['/login']);
+          }
+        },
       });
   }
 
@@ -163,7 +181,10 @@ export class Posts implements OnInit {
           this.cancelEditComment();
           this.loadComments(postId);
         },
-        error: err => console.error(err),
+        error: err => {     if (err.error.Code = 401){
+            this.auth.logout()
+          this.router.navigate(['/login']);
+          }},
       });
   }
 
@@ -192,7 +213,12 @@ export class Posts implements OnInit {
             })
           );
         },
-        error: err => console.error(err),
+        error: err => {
+               if (err.error.Code = 401){
+            this.auth.logout()
+          this.router.navigate(['/login']);
+          }
+        },
       });
   }
 
@@ -217,7 +243,10 @@ export class Posts implements OnInit {
       )
       .subscribe({
         next: () => this.closeReport(),
-        error: err => console.error(err),
+        error: err => {     if (err.error.Code = 401){
+            this.auth.logout()
+          this.router.navigate(['/login']);
+          }},
       });
   }
 
@@ -233,19 +262,19 @@ export class Posts implements OnInit {
       .subscribe({
         next: comments => {
 
-        const sorted = [...comments].sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() -
-            new Date(a.createdAt).getTime()
-        );
+          const sorted = [...comments].sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() -
+              new Date(a.createdAt).getTime()
+          );
 
-        this.posts.update(inner =>
-          inner.map(p =>
-            p.id === postId ? { ...p, comments: sorted } : p
-          )
-        );
-      },
+          this.posts.update(inner =>
+            inner.map(p =>
+              p.id === postId ? { ...p, comments: sorted } : p
+            )
+          );
+        },
         error: err => console.error(err),
       });
-}
+  }
 }

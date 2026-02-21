@@ -31,6 +31,10 @@ public class ReactionService {
         if (!user.isPresent()) {
             return new ErrorDto(HttpStatus.SC_INTERNAL_SERVER_ERROR, "someting went wrong please come back later");
         }
+        if (user.get().getIs_baned()){
+                        return new ErrorDto(HttpStatus.SC_UNAUTHORIZED, "the user is banned");
+
+        }
         if (this.repo.existsByUserIdAndPostId(user.get().getId(), postid)) {
             Optional<ReactionEntity> reaction = this.repo.findByUserIdAndPostId(user.get().getId(), postid);
             if (!reaction.isPresent()) {

@@ -9,7 +9,7 @@
         <!-- Title -->
         <div class="mb-3">
           <label class="form-label fw-semibold">Title</label>
-          <input type="text" class="form-control" formControlName="title" placeholder="Post title"
+          <input type="text" class="form-control" formControlName="title" maxlength="50" placeholder="Post title"
             [class.is-invalid]="titleError()" />
           <div class="text-danger small mt-1" *ngIf="titleError()">{{ titleError() }}</div>
         </div>
@@ -18,7 +18,7 @@
         <div class="mb-3">
           <label class="form-label fw-semibold">Content</label>
           <textarea class="form-control" rows="4" formControlName="content" placeholder="Write something..."
-            [class.is-invalid]="contentError()"></textarea>
+            maxlength="1000" [class.is-invalid]="contentError()"></textarea>
           <div class="text-danger small mt-1" *ngIf="contentError()">{{ contentError() }}</div>
         </div>
 
